@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:gravity="center" android:padding="12dp" android:background="@drawable/bg_good">
+    <TextView android:id="@+id/tEmoji" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="34sp" android:text="🙂" />
+    <TextView android:id="@+id/tComfort" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textColor="#FFFFFFFF" android:textSize="17sp" android:textStyle="bold" android:maxLines="1" android:text="–" />
+    <TextView android:id="@+id/tDew" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textColor="#E6FFFFFF" android:textSize="11sp" android:maxLines="1" />
+    <TextView android:id="@+id/tName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp"
+        android:textColor="#BBFFFFFF" android:textSize="11sp" android:maxLines="1" android:ellipsize="end" />
+</LinearLayout>

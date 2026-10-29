@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="sk" data-bs-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Offline · ESP32 DHT Station</title>
+<link href="assets/css/app.css" rel="stylesheet">
+<style>
+  body{background:#0b1020;color:#e2e8f0;font-family:system-ui,sans-serif;margin:0;display:grid;place-items:center;min-height:100vh;text-align:center;padding:1.5rem}
+  .box{max-width:360px} .ic{width:84px;height:84px;margin:0 auto 1.2rem;border-radius:26px;display:grid;place-items:center;font-size:2.4rem;background:linear-gradient(135deg,#6366f1,#06b6d4)}
+  button{margin-top:1rem;border:0;border-radius:1rem;padding:.8rem 1.4rem;font-weight:600;color:#fff;background:linear-gradient(135deg,#6366f1,#8b5cf6)}
+  p{color:#94a3b8}
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="ic">📡</div>
+    <h1>Si offline</h1>
+    <p>Nepodarilo sa spojiť so serverom. Skontroluj pripojenie na internet a skús to znova.</p>
+    <button onclick="location.reload()">Skúsiť znova</button>
+  </div>
+</body>
+</html>

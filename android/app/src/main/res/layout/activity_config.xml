@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Vyber zariadenie"
+        android:textSize="20sp" android:textStyle="bold" />
+    <TextView android:id="@+id/tInfo" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="6dp" android:textSize="13sp" android:alpha="0.75" android:text="Načítavam zariadenia…" />
+    <ListView android:id="@+id/list" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="10dp" android:minHeight="80dp" />
+    <Button android:id="@+id/bSettings" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="10dp" android:text="Otvoriť nastavenia pripojenia" android:visibility="gone" />
+</LinearLayout>

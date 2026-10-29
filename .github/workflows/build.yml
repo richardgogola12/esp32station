@@ -1,0 +1,84 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    name: Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Build APK
+        working-directory: android
+        run: gradle --no-daemon assembleDebug assembleRelease
+
+      - name: Rename APK
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/release/app-release.apk out/esp32dth-widgety.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk out/esp32dth-widgety-debug.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: esp32dth-widgety-apk
+          path: out/*.apk
+
+      - name: Publish release "latest"
+        if: github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: DHT Widgety – posledná verzia
+          body: |
+            Automaticky zostavená Android aplikácia s 10 widgetmi.
+            Stiahni **esp32dth-widgety.apk** a nainštaluj do telefónu (povoľ inštaláciu z neznámych zdrojov).
+          prerelease: false
+          make_latest: true
+          files: out/esp32dth-widgety.apk
+
+  esp32:
+    name: ESP32 firmvér
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/compile-sketches@v1
+        with:
+          fqbn: esp32:esp32:esp32
+          platforms: |
+            - name: esp32:esp32
+              source-url: https://espressif.github.io/arduino-esp32/package_esp32_index.json
+          libraries: |
+            - name: DHT sensor library
+            - name: Adafruit Unified Sensor
+          sketch-paths: |
+            - esp32/esp32_dht_station
+
+  web:
+    name: PHP kontrola
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+      - name: Lint
+        run: find web -name '*.php' -print0 | xargs -0 -n1 php -l

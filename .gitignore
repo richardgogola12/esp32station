@@ -1,0 +1,18 @@
+# Citlivé údaje – nepatria do verejného repozitára
+web/config.php
+web/storage/secret.key
+web/storage/sessions/sess_*
+
+# Android build
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+*.iml
+*.apk
+*.aab
+*.keystore
+*.jks
+
+.DS_Store

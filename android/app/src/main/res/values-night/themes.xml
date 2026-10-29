@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:colorPrimary">#6366F1</item>
+        <item name="android:colorPrimaryDark">#0B1020</item>
+        <item name="android:colorAccent">#818CF8</item>
+        <item name="android:windowBackground">#0B1020</item>
+        <item name="android:statusBarColor">#0B1020</item>
+        <item name="android:textColorPrimary">#E2E8F0</item>
+        <item name="android:textColorSecondary">#94A3B8</item>
+    </style>
+    <style name="AppTheme.Dialog" parent="@android:style/Theme.Material.Dialog">
+        <item name="android:colorAccent">#818CF8</item>
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+    </style>
+    <color name="card">#161D34</color>
+    <color name="muted">#94A3B8</color>
+    <color name="text">#E2E8F0</color>
+</resources>

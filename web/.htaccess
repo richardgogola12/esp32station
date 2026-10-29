@@ -1,0 +1,41 @@
+# ESP32 DHT Station
+Options -Indexes
+DirectoryIndex index.php
+AddDefaultCharset UTF-8
+
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+  AddType application/javascript .js
+</IfModule>
+
+# Citlivé súbory nesmú byť dostupné z webu
+<FilesMatch "^(config\.php|install\.sql|README\.md|.*\.(md|log|bak|sql|ini|sh))$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# Interné adresáre
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(includes|storage)(/|$) - [F,L]
+</IfModule>
+
+# Service worker nesmie byť cachovaný, ostatné statické súbory áno
+<IfModule mod_headers.c>
+  <FilesMatch "^sw\.js$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(css|js|png|svg|webmanifest)$">
+    Header set X-Content-Type-Options "nosniff"
+  </FilesMatch>
+</IfModule>
+
+# Ak hosting nastavuje Authorization hlavičku len cez CGI, sprístupni ju PHP
+<IfModule mod_setenvif.c>
+  SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+</IfModule>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DHT Widgety</string>
+    <string name="w01_label">Teplota</string>
+    <string name="w02_label">Vlhkosť</string>
+    <string name="w03_label">Teplota + vlhkosť</string>
+    <string name="w04_label">Karta zariadenia</string>
+    <string name="w05_label">Budíky</string>
+    <string name="w06_label">Graf 24 h</string>
+    <string name="w07_label">Dnešné min / max</string>
+    <string name="w08_label">Minimalistický</string>
+    <string name="w09_label">Všetky zariadenia</string>
+    <string name="w10_label">Komfort a rosný bod</string>
+    <string name="w01_desc">Veľká aktuálna teplota s trendom</string>
+    <string name="w02_desc">Aktuálna vlhkosť s ukazovateľom</string>
+    <string name="w03_desc">Teplota a vlhkosť vedľa seba</string>
+    <string name="w04_desc">Detail zariadenia s minigrafom</string>
+    <string name="w05_desc">Kruhové budíky teploty a vlhkosti</string>
+    <string name="w06_desc">Graf teploty a vlhkosti za 24 hodín</string>
+    <string name="w07_desc">Najnižšie a najvyššie hodnoty dnes</string>
+    <string name="w08_desc">Priehľadný riadok na plochu</string>
+    <string name="w09_desc">Prehľad všetkých senzorov</string>
+    <string name="w10_desc">Hodnotenie vzduchu a rosný bod</string>
+    <string name="dash">–</string>
+</resources>

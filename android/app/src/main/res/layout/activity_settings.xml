@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="20dp">
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:gravity="center_vertical" android:layout_marginTop="12dp" android:layout_marginBottom="20dp">
+            <ImageView android:layout_width="52dp" android:layout_height="52dp" android:src="@mipmap/ic_launcher" />
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="vertical" android:layout_marginStart="14dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="DHT Widgety" android:textSize="24sp" android:textStyle="bold" android:textColor="@color/text" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Teplota a vlhkosť z ESP32 na ploche" android:textColor="@color/muted" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
+            android:background="@drawable/bg_card_theme" android:padding="16dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pripojenie k serveru"
+                android:textStyle="bold" android:textSize="16sp" android:textColor="@color/text" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+                android:text="Na webe otvor Nastavenia → Android widgety a ťukni na „Nastaviť aplikáciu v tomto telefóne“. Alebo údaje zadaj ručne:"
+                android:textColor="@color/muted" android:textSize="13sp" />
+            <EditText android:id="@+id/eServer" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:hint="https://tvoja-domena.sk/esp32dth/" android:inputType="textUri"
+                android:importantForAutofill="no" android:singleLine="true" />
+            <EditText android:id="@+id/eToken" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="Token pre widgety" android:inputType="textVisiblePassword" android:fontFamily="monospace"
+                android:importantForAutofill="no" android:singleLine="true" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp">
+                <Button android:id="@+id/bPaste" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:text="Vložiť token" style="@android:style/Widget.Material.Button.Borderless.Colored" />
+                <Button android:id="@+id/bSave" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:text="Uložiť a otestovať" />
+            </LinearLayout>
+            <TextView android:id="@+id/tStatus" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:textColor="@color/muted" android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
+            android:background="@drawable/bg_card_theme" android:padding="16dp" android:layout_marginTop="14dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Zariadenia"
+                android:textStyle="bold" android:textSize="16sp" android:textColor="@color/text" />
+            <TextView android:id="@+id/tDevices" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="6dp" android:textColor="@color/text" android:lineSpacingExtra="4dp" android:text="–" />
+            <TextView android:id="@+id/tSchedule" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:textColor="@color/muted" android:textSize="12sp" />
+            <Button android:id="@+id/bRefresh" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="6dp" android:text="Aktualizovať widgety teraz" />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
+            android:background="@drawable/bg_card_theme" android:padding="16dp" android:layout_marginTop="14dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Spoľahlivý štart po zapnutí"
+                android:textStyle="bold" android:textSize="16sp" android:textColor="@color/text" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+                android:text="Widgety sa po reštarte telefónu spustia samé. Niektorí výrobcovia (Xiaomi, Huawei, Samsung…) to však blokujú – povoľ preto aplikácii prácu na pozadí."
+                android:textColor="@color/muted" android:textSize="13sp" />
+            <Button android:id="@+id/bBattery" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:text="Vypnúť obmedzenie batérie" />
+            <Button android:id="@+id/bAutostart" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Povoliť automatické spustenie" android:visibility="gone" />
+        </LinearLayout>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp"
+            android:text="Ako pridať widget: podrž prst na ploche → Widgety → DHT Widgety → vyber jeden z 10 vzhľadov."
+            android:textColor="@color/muted" android:textSize="13sp" android:gravity="center" />
+    </LinearLayout>
+</ScrollView>

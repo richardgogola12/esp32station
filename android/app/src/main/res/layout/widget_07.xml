@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:gravity="center_vertical" android:padding="9dp" android:background="@drawable/bg_dark">
+    <TextView android:id="@+id/tName" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="4dp"
+        android:textColor="#CCFFFFFF" android:textSize="12sp" android:maxLines="1" android:ellipsize="end" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+        <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical"
+            android:background="@drawable/bg_row" android:padding="8dp" android:layout_margin="3dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#99FFFFFF" android:textSize="10sp" android:text="▼ teplota" />
+            <TextView android:id="@+id/tTmin" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FF93C5FD" android:textSize="18sp" android:textStyle="bold" android:text="–" />
+        </LinearLayout>
+        <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical"
+            android:background="@drawable/bg_row" android:padding="8dp" android:layout_margin="3dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#99FFFFFF" android:textSize="10sp" android:text="▲ teplota" />
+            <TextView android:id="@+id/tTmax" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFDBA74" android:textSize="18sp" android:textStyle="bold" android:text="–" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+        <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical"
+            android:background="@drawable/bg_row" android:padding="8dp" android:layout_margin="3dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#99FFFFFF" android:textSize="10sp" android:text="▼ vlhkosť" />
+            <TextView android:id="@+id/tHmin" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FF7DD3FC" android:textSize="18sp" android:textStyle="bold" android:text="–" />
+        </LinearLayout>
+        <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical"
+            android:background="@drawable/bg_row" android:padding="8dp" android:layout_margin="3dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#99FFFFFF" android:textSize="10sp" android:text="▲ vlhkosť" />
+            <TextView android:id="@+id/tHmax" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FF67E8F9" android:textSize="18sp" android:textStyle="bold" android:text="–" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
