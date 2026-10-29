@@ -6,6 +6,7 @@ start_session();
 $u = require_login();
 $uid = (int)$u['id'];
 $ut = t('users');
+ensure_schema();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
@@ -18,12 +19,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         flash('success', 'Interval obnovy widgetov je ' . $min . ' min. Widgety si ho prevezmú pri najbližšej aktualizácii.');
     } elseif ($action === 'widget_token') {
         $token = bin2hex(random_bytes(20));
-        db()->prepare("UPDATE $ut SET widget_token_hash = ?, widget_token_hint = ? WHERE id = ?")
-            ->execute([hash('sha256', $token), substr($token, -4), $uid]);
-        sess_set('widget_token', $token);
+        db()->prepare("UPDATE $ut SET widget_token_hash = ?, widget_token_hint = ?, widget_token_enc = ? WHERE id = ?")
+            ->execute([hash('sha256', $token), substr($token, -4), encrypt_secret($token), $uid]);
         flash('success', 'Nový token pre widgety je vygenerovaný. Starý token prestal platiť.');
     } elseif ($action === 'widget_revoke') {
-        db()->prepare("UPDATE $ut SET widget_token_hash = NULL, widget_token_hint = NULL WHERE id = ?")->execute([$uid]);
+        db()->prepare("UPDATE $ut SET widget_token_hash = NULL, widget_token_hint = NULL, widget_token_enc = NULL WHERE id = ?")->execute([$uid]);
         flash('success', 'Prístup widgetov bol zrušený.');
     } elseif ($action === 'password') {
         $st = db()->prepare("SELECT password_hash FROM $ut WHERE id = ?");
@@ -64,8 +64,9 @@ $st = db()->prepare('SELECT id, name, created_at, last_used_at FROM ' . t('webau
 $st->execute([$uid]);
 $passkeys = $st->fetchAll();
 
-$newToken = sess('widget_token');
-sess_unset('widget_token');
+$tk = db()->prepare("SELECT widget_token_enc FROM $ut WHERE id = ?");
+$tk->execute([$uid]);
+$newToken = decrypt_secret($tk->fetchColumn() ?: null);
 $server = absolute_url('');
 $intentUrl = $newToken
     ? 'intent://setup?server=' . rawurlencode($server) . '&token=' . $newToken . '#Intent;scheme=esp32dth;package=sk.esp32dth.widget;end'
@@ -158,7 +159,7 @@ require __DIR__ . '/includes/header.php';
 
       <?php if ($newToken): ?>
         <div class="token-box mb-3">
-          <div class="alert alert-warning small mb-2"><i class="bi bi-shield-lock me-1"></i> Token sa zobrazuje iba teraz. Ulož si ho alebo rovno nastav aplikáciu.</div>
+          <div class="small text-secondary mb-2"><i class="bi bi-shield-lock me-1"></i> Token neposielaj nikomu – kto ho má, vidí tvoje merania.</div>
           <a class="btn btn-success w-100 mb-2 d-android" href="<?= e($intentUrl) ?>"><i class="bi bi-android2 me-1"></i> Nastaviť aplikáciu v tomto telefóne</a>
           <label class="form-label small text-secondary mb-1">Adresa servera</label>
           <div class="copy-field mb-2"><code id="srvUrl"><?= e($server) ?></code><button class="btn btn-sm btn-copy" type="button" data-copy="#srvUrl"><i class="bi bi-clipboard"></i></button></div>
@@ -171,7 +172,7 @@ require __DIR__ . '/includes/header.php';
           <div class="flex-grow-1">
             <?php if ($u['widget_token_hint']): ?>
               <div class="fw-semibold">Token je aktívny</div>
-              <div class="small text-secondary">končí na …<?= e($u['widget_token_hint']) ?></div>
+              <div class="small text-secondary">končí na …<?= e($u['widget_token_hint']) ?> · bol vytvorený v staršej verzii a nedá sa zobraziť – vygeneruj nový</div>
             <?php else: ?>
               <div class="fw-semibold">Widgety zatiaľ nemajú prístup</div>
               <div class="small text-secondary">Vygeneruj token a zadaj ho v aplikácii.</div>

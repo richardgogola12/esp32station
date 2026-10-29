@@ -11,7 +11,7 @@ if (PHP_VERSION_ID < 80000) {
 }
 
 define('APP_ROOT', dirname(__DIR__));
-define('APP_VERSION', '1.1.0');
+define('APP_VERSION', '1.1.1');
 
 $GLOBALS['__esp32dth_cfg'] = require APP_ROOT . '/config.php';
 
@@ -499,6 +499,10 @@ function ensure_schema(): void
         $has = db()->query("SHOW COLUMNS FROM `$tbl` LIKE 'api_key_enc'")->fetch();
         if (!$has) {
             db()->exec("ALTER TABLE `$tbl` ADD COLUMN `api_key_enc` VARCHAR(255) NULL DEFAULT NULL AFTER `api_key_hint`");
+        }
+        $ut = t('users');
+        if (!db()->query("SHOW COLUMNS FROM `$ut` LIKE 'widget_token_enc'")->fetch()) {
+            db()->exec("ALTER TABLE `$ut` ADD COLUMN `widget_token_enc` VARCHAR(255) NULL DEFAULT NULL AFTER `widget_token_hint`");
         }
     } catch (PDOException $e) {
         error_log('[esp32dth] ensure_schema: ' . $e->getMessage());

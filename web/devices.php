@@ -169,22 +169,6 @@ require __DIR__ . '/includes/header.php';
           </div>
           <?php if ($d['description']): ?><p class="small mt-2 mb-0 text-body-secondary"><?= nl2br(e($d['description'])) ?></p><?php endif; ?>
         </div>
-        <div class="dropdown">
-          <button class="btn btn-icon" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' type="button" aria-label="Akcie"><i class="bi bi-three-dots-vertical"></i></button>
-          <ul class="dropdown-menu dropdown-menu-end shadow-lg">
-            <li><button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#deviceModal" data-mode="edit" data-device='<?= e(json_encode([
-                'id' => (int)$d['id'], 'name' => $d['name'], 'slug' => $d['slug'], 'description' => (string)$d['description'],
-                'location' => (string)$d['location'], 'interval' => (int)$d['interval_sec'], 'temp_offset' => (float)$d['temp_offset'],
-                'hum_offset' => (float)$d['hum_offset'], 'is_active' => (bool)$d['is_active'], 'color' => $d['color'],
-            ], JSON_UNESCAPED_UNICODE)) ?>'><i class="bi bi-pencil me-2"></i>Upraviť</button></li>
-            <li><button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#espModal" data-id="<?= (int)$d['id'] ?>" data-slug="<?= e($d['slug']) ?>" data-name="<?= e($d['name']) ?>"><i class="bi bi-key me-2"></i>API kľúč a kód pre ESP32</button></li>
-            <li><a class="dropdown-item" href="<?= e(url('history.php?d[]=' . $d['id'])) ?>"><i class="bi bi-graph-up me-2"></i>História</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><button class="dropdown-item" type="button" data-confirm="regen" data-id="<?= (int)$d['id'] ?>" data-name="<?= e($d['name']) ?>"><i class="bi bi-key me-2"></i>Nový API kľúč</button></li>
-            <li><button class="dropdown-item" type="button" data-confirm="clear" data-id="<?= (int)$d['id'] ?>" data-name="<?= e($d['name']) ?>"><i class="bi bi-eraser me-2"></i>Vymazať merania</button></li>
-            <li><button class="dropdown-item text-danger" type="button" data-confirm="delete" data-id="<?= (int)$d['id'] ?>" data-name="<?= e($d['name']) ?>"><i class="bi bi-trash me-2"></i>Zmazať zariadenie</button></li>
-          </ul>
-        </div>
       </div>
       <div class="manage-stats">
         <div><span>Interval</span><b><?= e(format_interval((int)$d['interval_sec'])) ?></b></div>
@@ -207,6 +191,8 @@ require __DIR__ . '/includes/header.php';
             'hum_offset' => (float)$d['hum_offset'], 'is_active' => (bool)$d['is_active'], 'color' => $d['color'],
         ], JSON_UNESCAPED_UNICODE)) ?>'><i class="bi bi-pencil me-1"></i> Upraviť</button>
         <a class="btn btn-sm btn-ghost" href="<?= e(url('history.php?d[]=' . $d['id'])) ?>"><i class="bi bi-graph-up me-1"></i> História</a>
+        <button class="btn btn-sm btn-ghost" type="button" data-confirm="clear" data-id="<?= (int)$d['id'] ?>" data-name="<?= e($d['name']) ?>"><i class="bi bi-eraser me-1"></i> Vymazať merania</button>
+        <button class="btn btn-sm btn-ghost text-danger" type="button" data-confirm="delete" data-id="<?= (int)$d['id'] ?>" data-name="<?= e($d['name']) ?>"><i class="bi bi-trash me-1"></i> Zmazať</button>
       </div>
     </article>
   </div>

@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `esp32dth_users` (
   `password_hash`      VARCHAR(255) NOT NULL,
   `widget_token_hash`  CHAR(64)     NULL DEFAULT NULL,
   `widget_token_hint`  VARCHAR(8)   NULL DEFAULT NULL,
+  `widget_token_enc`   VARCHAR(255) NULL DEFAULT NULL,
   `widget_refresh_min` SMALLINT UNSIGNED NOT NULL DEFAULT 15,
   `created_at`         DATETIME     NOT NULL,
   `last_login_at`      DATETIME     NULL DEFAULT NULL,
