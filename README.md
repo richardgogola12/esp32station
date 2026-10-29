@@ -71,11 +71,21 @@ API: `POST /api/ingest.php`, hlavičky `X-Device-Name`, `X-Api-Key`, telo `{"tem
 ## 3. Android widgety
 
 1. Hotové APK sa po každom pushi zostaví cez GitHub Actions – stiahni **esp32dth-widgety.apk**
-   z [Releases → latest](../../releases/latest). (Alebo otvor `android/` v Android Studiu → *Build → Build APK(s)*.)
+   z [Releases → latest](../../releases/latest/download/esp32dth-widgety.apk). (Alebo otvor `android/` v Android Studiu → *Build → Build APK(s)*.)
 2. Nainštaluj APK do telefónu (povoľ inštaláciu z neznámych zdrojov) a raz otvor aplikáciu **DHT Widgety**.
 3. Na webe: **Nastavenia → Android widgety → Vygenerovať token** → v telefóne ťukni na
    **„Nastaviť aplikáciu v tomto telefóne“** (alebo skopíruj adresu a token ručne).
 4. Na ploche pridaj widgety (podrž prst → Widgety → DHT Widgety).
+
+**Aktualizácie aplikácie:** pri každom spustení aplikácia skontroluje GitHub Releases a ponúkne novú verziu
+(tlačidlo *Skontrolovať aktualizácie* / *Aktualizovať*). Po zapnutí telefónu kontroluje na pozadí a pošle upozornenie.
+Pri prvej aktualizácii povoľ aplikácii „Inštalovať neznáme aplikácie“.
+APK je podpísané stálym kľúčom `android/app/signing/release.keystore` (inak by sa nová verzia nedala nainštalovať cez starú).
+Ak chceš vlastný tajný kľúč, nastav v GitHube secrets `KEYSTORE_FILE`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
+
+**Voliteľné údaje vo widgete** (vyberáš pri pridaní widgetu, alebo v aplikácii v sekcii *Moje widgety*):
+adresa / umiestnenie, aktuálny čas, aktuálny dátum, rosný bod a komfort, dnešné min/max, čas poslednej aktualizácie.
+Každý widget má ikony (teplota, vlhkosť, miesto, čas, dátum, aktualizácia).
 
 **10 widgetov:** Teplota · Vlhkosť · Teplota + vlhkosť · Karta zariadenia s minigrafom · Kruhové budíky ·
 Graf 24 h · Dnešné min/max · Minimalistický priehľadný · Všetky zariadenia · Komfort a rosný bod.

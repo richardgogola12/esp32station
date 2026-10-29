@@ -53,21 +53,23 @@
     setTimeout(() => el.remove(), 5500);
   });
 
-  // Prepínač témy
-  const tt = document.getElementById('themeToggle');
+  // Prepínač témy (bočné menu aj mobilná lišta)
+  const toggles = [document.getElementById('themeToggle'), document.getElementById('themeToggleM')].filter(Boolean);
   const setIcon = () => {
-    if (!tt) return;
     const dark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-    tt.innerHTML = dark ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>';
+    toggles.forEach((t) => {
+      const i = t.querySelector('i');
+      if (i) i.className = 'bi ' + (dark ? 'bi-sun' : 'bi-moon-stars');
+    });
   };
   setIcon();
-  tt?.addEventListener('click', () => {
+  toggles.forEach((tt) => tt.addEventListener('click', () => {
     const next = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-bs-theme', next);
     try { localStorage.setItem('esp32dth-theme', next); } catch (e) {}
     setIcon();
     document.dispatchEvent(new CustomEvent('themechange'));
-  });
+  }));
 
   // Zobrazenie hesla
   document.querySelectorAll('[data-reveal]').forEach((b) => b.addEventListener('click', () => {
@@ -112,13 +114,13 @@
     window.addEventListener('load', () => navigator.serviceWorker.register(App.url('sw.js'), { scope: App.base + '/' }).catch(() => {}));
   }
   let deferred = null;
-  const ib = document.getElementById('installBtn');
-  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e; ib?.classList.remove('d-none'); });
-  ib?.addEventListener('click', async () => {
+  const ibs = [document.getElementById('installBtn'), document.getElementById('installBtnM')].filter(Boolean);
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e; ibs.forEach((b) => b.classList.remove('d-none')); });
+  ibs.forEach((ib) => ib.addEventListener('click', async () => {
     if (!deferred) return;
     deferred.prompt();
     await deferred.userChoice;
-    deferred = null; ib.classList.add('d-none');
-  });
-  window.addEventListener('appinstalled', () => ib?.classList.add('d-none'));
+    deferred = null; ibs.forEach((b) => b.classList.add('d-none'));
+  }));
+  window.addEventListener('appinstalled', () => ibs.forEach((b) => b.classList.add('d-none')));
 })();

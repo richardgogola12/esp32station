@@ -2,15 +2,16 @@
 declare(strict_types=1);
 defined('APP_ROOT') || exit;
 
-/** @var string $pageTitle  @var string $activeNav  @var bool $authLayout */
-$pageTitle  = $pageTitle ?? '';
-$activeNav  = $activeNav ?? '';
-$authLayout = $authLayout ?? false;
-$user       = $authLayout ? null : current_user();
+/** @var string $pageTitle  @var string $activeNav  @var bool $authLayout  @var string $pageSubtitle */
+$pageTitle    = $pageTitle ?? '';
+$pageSubtitle = $pageSubtitle ?? '';
+$activeNav    = $activeNav ?? '';
+$authLayout   = $authLayout ?? false;
+$user         = $authLayout ? null : current_user();
 send_security_headers();
 
 $nav = [
-    'dashboard' => ['index.php',    'bi-speedometer2', 'Prehľad'],
+    'dashboard' => ['index.php',    'bi-grid-1x2',     'Prehľad'],
     'history'   => ['history.php',  'bi-graph-up',     'História'],
     'devices'   => ['devices.php',  'bi-cpu',          'Zariadenia'],
     'settings'  => ['settings.php', 'bi-gear',         'Nastavenia'],
@@ -24,8 +25,8 @@ $nav = [
 <title><?= e(($pageTitle ? $pageTitle . ' · ' : '') . cfg('name')) ?></title>
 <meta name="csrf-token" content="<?= e(csrf_token()) ?>">
 <meta name="app-base" content="<?= e(base_path()) ?>">
-<meta name="theme-color" content="#0b1020" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#f4f6fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1420" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f5f7fb" media="(prefers-color-scheme: light)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -42,51 +43,60 @@ $nav = [
 <link href="<?= e(url('assets/css/app.css')) ?>?v=<?= APP_VERSION ?>" rel="stylesheet">
 </head>
 <body class="<?= $authLayout ? 'auth-body' : 'app-body' ?>">
-<div class="bg-orbs" aria-hidden="true"><span></span><span></span><span></span></div>
 
 <?php if (!$authLayout && $user): ?>
-<nav class="navbar navbar-expand-lg app-navbar sticky-top">
-  <div class="container-xl">
-    <a class="navbar-brand d-flex align-items-center gap-2" href="<?= e(url('index.php')) ?>">
-      <span class="brand-logo"><i class="bi bi-thermometer-half"></i></span>
-      <span class="fw-bold"><?= e(cfg('short_name')) ?></span>
-    </a>
-    <div class="d-none d-lg-flex ms-4 gap-1">
-      <?php foreach ($nav as $key => [$href, $icon, $label]): ?>
-        <a class="nav-pill <?= $activeNav === $key ? 'active' : '' ?>" href="<?= e(url($href)) ?>">
-          <i class="bi <?= $icon ?>"></i> <?= e($label) ?>
-        </a>
-      <?php endforeach; ?>
-    </div>
-    <div class="ms-auto d-flex align-items-center gap-2">
-      <button class="btn btn-icon d-none" id="installBtn" type="button" title="Nainštalovať aplikáciu"><i class="bi bi-download"></i></button>
-      <button class="btn btn-icon" id="themeToggle" type="button" title="Prepnúť tému"><i class="bi bi-moon-stars"></i></button>
-      <div class="dropdown">
-        <button class="btn btn-avatar" data-bs-toggle="dropdown" aria-expanded="false" type="button">
-          <?= e(mb_strtoupper(mb_substr($user['username'], 0, 1))) ?>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end shadow-lg">
-          <li><h6 class="dropdown-header"><?= e($user['username']) ?><br><small class="text-secondary fw-normal"><?= e($user['email']) ?></small></h6></li>
-          <li><a class="dropdown-item" href="<?= e(url('settings.php')) ?>"><i class="bi bi-gear me-2"></i>Nastavenia</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li>
-            <form method="post" action="<?= e(url('logout.php')) ?>" class="m-0">
-              <?= csrf_field() ?>
-              <button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right me-2"></i>Odhlásiť sa</button>
-            </form>
-          </li>
-        </ul>
+<!-- Bočné menu (počítač) -->
+<aside class="sidebar d-none d-lg-flex">
+  <a class="brand" href="<?= e(url('index.php')) ?>">
+    <span class="brand-logo"><i class="bi bi-thermometer-half"></i></span>
+    <span><?= e(cfg('short_name')) ?></span>
+  </a>
+  <nav class="side-nav">
+    <?php foreach ($nav as $key => [$href, $icon, $label]): ?>
+      <a class="<?= $activeNav === $key ? 'active' : '' ?>" href="<?= e(url($href)) ?>">
+        <i class="bi <?= $icon ?>"></i><span><?= e($label) ?></span>
+      </a>
+    <?php endforeach; ?>
+  </nav>
+  <div class="side-foot">
+    <button class="side-btn d-none" id="installBtn" type="button"><i class="bi bi-download"></i><span>Nainštalovať aplikáciu</span></button>
+    <button class="side-btn" id="themeToggle" type="button"><i class="bi bi-moon-stars"></i><span>Prepnúť tému</span></button>
+    <div class="side-user">
+      <span class="avatar"><?= e(mb_strtoupper(mb_substr($user['username'], 0, 1))) ?></span>
+      <div class="min-w-0 flex-grow-1">
+        <div class="fw-semibold text-truncate"><?= e($user['username']) ?></div>
+        <div class="small text-secondary text-truncate"><?= e($user['email']) ?></div>
       </div>
+      <form method="post" action="<?= e(url('logout.php')) ?>" class="m-0">
+        <?= csrf_field() ?>
+        <button class="btn-icon" type="submit" title="Odhlásiť sa"><i class="bi bi-box-arrow-right"></i></button>
+      </form>
     </div>
   </div>
-</nav>
+</aside>
+
+<!-- Horná lišta (mobil) -->
+<header class="topbar d-lg-none">
+  <a class="brand" href="<?= e(url('index.php')) ?>">
+    <span class="brand-logo"><i class="bi bi-thermometer-half"></i></span>
+    <span><?= e(cfg('short_name')) ?></span>
+  </a>
+  <div class="d-flex align-items-center gap-1">
+    <button class="btn-icon d-none" id="installBtnM" type="button" title="Nainštalovať"><i class="bi bi-download"></i></button>
+    <button class="btn-icon" id="themeToggleM" type="button" title="Téma"><i class="bi bi-moon-stars"></i></button>
+    <form method="post" action="<?= e(url('logout.php')) ?>" class="m-0">
+      <?= csrf_field() ?>
+      <button class="btn-icon" type="submit" title="Odhlásiť sa"><i class="bi bi-box-arrow-right"></i></button>
+    </form>
+  </div>
+</header>
 <?php endif; ?>
 
 <?php if (!$authLayout): ?>
-<main class="container-xl app-main">
+<main class="app-main">
   <div class="toast-stack" id="toastStack">
     <?php foreach (take_flash() as $f): ?>
-      <div class="alert alert-<?= e($f['type']) ?> alert-dismissible fade show glass-alert" role="alert">
+      <div class="alert alert-<?= e($f['type']) ?> alert-dismissible fade show" role="alert">
         <?= e($f['msg']) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zavrieť"></button>
       </div>

@@ -11,7 +11,7 @@ if (PHP_VERSION_ID < 80000) {
 }
 
 define('APP_ROOT', dirname(__DIR__));
-define('APP_VERSION', '1.0.1');
+define('APP_VERSION', '1.1.0');
 
 $GLOBALS['__esp32dth_cfg'] = require APP_ROOT . '/config.php';
 

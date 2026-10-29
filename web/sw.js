@@ -1,5 +1,5 @@
 /* ESP32 DHT Station – service worker (PWA) */
-const VERSION = 'esp32dth-v1.0.1';
+const VERSION = 'esp32dth-v1.1.0';
 const STATIC = VERSION + '-static';
 const RUNTIME = VERSION + '-runtime';
 const PRECACHE = [

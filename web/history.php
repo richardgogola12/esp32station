@@ -66,7 +66,7 @@ require __DIR__ . '/includes/header.php';
   </div>
 <?php else: ?>
 
-<form class="filter-bar glass mb-4" method="get" id="filterForm">
+<form class="filter-bar glass mb-3" method="get" id="filterForm">
   <div class="quick-ranges mb-3" id="quickRanges">
     <button type="button" data-range="1h">1 h</button>
     <button type="button" data-range="24h">24 h</button>
@@ -109,49 +109,54 @@ require __DIR__ . '/includes/header.php';
   </div>
 </form>
 
-<div class="row g-3 mb-4">
-  <?php foreach ($f['devices'] as $id): $s = $stats[$id] ?? null; $d = $byId[$id]; ?>
-  <div class="col-12 col-md-6 col-xl-4">
-    <div class="stats-card glass" style="--dev-color: <?= e($d['color']) ?>">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="h6 fw-bold mb-0"><i class="dot"></i> <?= e($d['name']) ?></h3>
-        <span class="small text-secondary"><?= $s ? number_format($s['count'], 0, ',', ' ') . ' meraní' : 'bez dát' ?></span>
-      </div>
-      <?php if ($s): ?>
-      <div class="stats-grid">
-        <div class="sg temp"><span>Min</span><b><?= fmt_num($s['tmin']) ?>°</b></div>
-        <div class="sg temp"><span>Priemer</span><b><?= fmt_num($s['tavg']) ?>°</b></div>
-        <div class="sg temp"><span>Max</span><b><?= fmt_num($s['tmax']) ?>°</b></div>
-        <div class="sg hum"><span>Min</span><b><?= fmt_num($s['hmin'], 0) ?>%</b></div>
-        <div class="sg hum"><span>Priemer</span><b><?= fmt_num($s['havg'], 0) ?>%</b></div>
-        <div class="sg hum"><span>Max</span><b><?= fmt_num($s['hmax'], 0) ?>%</b></div>
-      </div>
-      <?php else: ?>
-        <p class="small text-secondary mb-0">V zvolenom období nie sú žiadne merania.</p>
-      <?php endif; ?>
-    </div>
-  </div>
-  <?php endforeach; ?>
-</div>
-
-<section class="glass panel mb-4">
+<section class="glass panel mb-3">
   <div class="panel-head">
-    <h2 class="panel-title"><i class="bi bi-thermometer-half text-temp"></i> Teplota</h2>
-    <div class="d-flex align-items-center gap-2">
+    <h2 class="panel-title"><i class="bi bi-graph-up"></i> Graf</h2>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
       <span class="small text-secondary" id="aggLabel"></span>
+      <div class="seg" id="chartSeg">
+        <button class="active" type="button" data-chart="t"><i class="bi bi-thermometer-half"></i> Teplota</button>
+        <button type="button" data-chart="h"><i class="bi bi-droplet-half"></i> Vlhkosť</button>
+      </div>
     </div>
   </div>
-  <div class="chart-box chart-lg"><canvas id="tChart"></canvas></div>
+  <div class="chart-box chart-lg" id="wrapT"><canvas id="tChart"></canvas></div>
+  <div class="chart-box chart-lg d-none" id="wrapH"><canvas id="hChart"></canvas></div>
 </section>
 
-<section class="glass panel mb-4">
+<section class="glass panel mb-3">
   <div class="panel-head">
-    <h2 class="panel-title"><i class="bi bi-droplet-half text-hum"></i> Vlhkosť</h2>
+    <h2 class="panel-title"><i class="bi bi-bar-chart"></i> Štatistiky za obdobie</h2>
   </div>
-  <div class="chart-box chart-lg"><canvas id="hChart"></canvas></div>
+  <div class="table-responsive">
+    <table class="table table-modern stats-table align-middle">
+      <thead>
+        <tr>
+          <th>Zariadenie</th>
+          <th class="num"><i class="bi bi-thermometer-half text-temp"></i> Min</th><th class="num">Priemer</th><th class="num">Max</th>
+          <th class="num"><i class="bi bi-droplet-half text-hum"></i> Min</th><th class="num">Priemer</th><th class="num">Max</th>
+          <th class="num">Meraní</th>
+        </tr>
+      </thead>
+      <tbody>
+      <?php foreach ($f['devices'] as $id): $st = $stats[$id] ?? null; $d = $byId[$id]; ?>
+        <tr>
+          <td><span class="dchip-static" style="--dev-color: <?= e($d['color']) ?>"><i class="dot"></i><?= e($d['name']) ?></span></td>
+          <?php if ($st): ?>
+            <td class="num text-temp"><?= fmt_num($st['tmin']) ?>°</td><td class="num fw-semibold text-temp"><?= fmt_num($st['tavg']) ?>°</td><td class="num text-temp"><?= fmt_num($st['tmax']) ?>°</td>
+            <td class="num text-hum"><?= fmt_num($st['hmin'], 0) ?>%</td><td class="num fw-semibold text-hum"><?= fmt_num($st['havg'], 0) ?>%</td><td class="num text-hum"><?= fmt_num($st['hmax'], 0) ?>%</td>
+            <td class="num text-secondary"><?= number_format($st['count'], 0, ',', ' ') ?></td>
+          <?php else: ?>
+            <td colspan="7" class="text-secondary">V zvolenom období bez meraní</td>
+          <?php endif; ?>
+        </tr>
+      <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
 </section>
 
-<section class="glass panel mb-4" id="table">
+<section class="glass panel mb-3" id="table">
   <div class="panel-head">
     <h2 class="panel-title"><i class="bi bi-table"></i> Merania</h2>
     <span class="small text-secondary"><?= number_format($total, 0, ',', ' ') ?> záznamov</span>

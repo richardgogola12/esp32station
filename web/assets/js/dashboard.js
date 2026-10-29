@@ -34,7 +34,7 @@
       f('seen').textContent = d.last_seen_h;
       f('dew').textContent = App.num(d.dew_point, 1);
       f('comfort').textContent = d.comfort || '–';
-      f('range').textContent = d.today ? `${App.num(d.today.tmin)} – ${App.num(d.today.tmax)} °C` : '–';
+      f('range').textContent = d.today ? `${App.num(d.today.tmin)}–${App.num(d.today.tmax)} °C` : '–';
       f('tt').innerHTML = trendHtml(d.trend_t, '°C');
       f('ht').innerHTML = trendHtml(d.trend_h, '%');
       const st = f('status');

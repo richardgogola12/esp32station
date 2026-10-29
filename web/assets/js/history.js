@@ -75,3 +75,18 @@
   });
   document.addEventListener('themechange', draw);
 })();
+
+// Prepínanie grafu teplota / vlhkosť
+(function () {
+  const seg = document.getElementById('chartSeg');
+  if (!seg) return;
+  seg.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-chart]');
+    if (!b) return;
+    seg.querySelectorAll('button').forEach((x) => x.classList.toggle('active', x === b));
+    const t = b.dataset.chart === 't';
+    document.getElementById('wrapT').classList.toggle('d-none', !t);
+    document.getElementById('wrapH').classList.toggle('d-none', t);
+    window.dispatchEvent(new Event('resize'));
+  });
+})();
