@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="top" android:padding="12dp" android:background="@drawable/bg_dark">
+<include layout="@layout/widget_clock_block" />
 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
   <ImageView android:layout_width="15dp" android:layout_height="15dp" android:layout_marginEnd="6dp" android:src="@drawable/ic_sensor" android:tint="#FFA5B4FC" android:importantForAccessibility="no" />
   <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:textColor="#FFFFFFFF" android:textSize="14sp" android:textStyle="bold" android:text="Všetky senzory" />

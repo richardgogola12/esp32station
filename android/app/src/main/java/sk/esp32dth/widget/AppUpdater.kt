@@ -157,6 +157,10 @@ class InstallReceiver : BroadcastReceiver() {
                 "Nová verzia je podpísaná iným kľúčom ako nainštalovaná. Odinštaluj aplikáciu a nainštaluj ju znova z GitHubu – potom už aktualizácie pôjdu.",
                 Toast.LENGTH_LONG).show()
             PackageInstaller.STATUS_FAILURE_ABORTED -> Toast.makeText(context, "Inštalácia bola zrušená", Toast.LENGTH_SHORT).show()
+            PackageInstaller.STATUS_FAILURE_CONFLICT, PackageInstaller.STATUS_FAILURE_INCOMPATIBLE -> Toast.makeText(context,
+                "Nainštalovaná aplikácia je podpísaná iným kľúčom. Odinštaluj ju a nainštaluj znova z GitHubu – potom už aktualizácie pôjdu.",
+                Toast.LENGTH_LONG).show()
+            PackageInstaller.STATUS_FAILURE_ABORTED -> Toast.makeText(context, "Inštalácia bola zrušená", Toast.LENGTH_SHORT).show()
             else -> {
                 val msg = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE) ?: "neznáma chyba"
                 Toast.makeText(context, "Aktualizácia zlyhala: $msg", Toast.LENGTH_LONG).show()
