@@ -152,8 +152,7 @@ class SettingsActivity : Activity() {
         val box = findViewById<LinearLayout>(R.id.widgetList)
         box.removeAllViews()
         val snap = WidgetRenderer.snapshot(this)
-        val names = mapOf(1 to "Teplota", 2 to "Vlhkosť", 3 to "Teplota + vlhkosť", 4 to "Karta zariadenia", 5 to "Budíky",
-            6 to "Graf 24 h", 7 to "Dnešné min / max", 8 to "Minimalistický", 9 to "Všetky zariadenia", 10 to "Komfort")
+        val names = WidgetRenderer.NAMES
         val ids = WidgetRenderer.allWidgetIds(this)
         if (ids.isEmpty()) {
             box.addView(TextView(this).apply { text = "Na ploche zatiaľ nemáš žiadny widget."; setTextColor(getColor(R.color.muted)) })
@@ -161,7 +160,7 @@ class SettingsActivity : Activity() {
         }
         for (id in ids) {
             val kind = WidgetRenderer.kindOf(this, id) ?: continue
-            val dev = if (kind == 9) "všetky senzory" else snap?.device(Prefs.widgetDevice(this, id))?.name ?: "–"
+            val dev = if (kind == 3) "všetky senzory" else snap?.device(Prefs.widgetDevice(this, id))?.name ?: "–"
             val b = Button(this, null, 0, android.R.style.Widget_Material_Button_Borderless_Colored).apply {
                 text = "✎  ${names[kind]} · $dev"
                 isAllCaps = false

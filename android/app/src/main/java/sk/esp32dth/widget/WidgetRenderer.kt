@@ -12,29 +12,22 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/** Vykresľuje všetkých 10 typov widgetov z posledných uložených dát. */
+/** Vykresľuje 3 widgety: Kompakt, Detail, Všetky senzory. */
 object WidgetRenderer {
 
     val PROVIDERS: List<Pair<Class<*>, Int>> = listOf(
-        W01Temperature::class.java to 1,
-        W02Humidity::class.java to 2,
-        W03Combo::class.java to 3,
-        W04Card::class.java to 4,
-        W05Gauge::class.java to 5,
-        W06Chart::class.java to 6,
-        W07MinMax::class.java to 7,
-        W08Minimal::class.java to 8,
-        W09AllDevices::class.java to 9,
-        W10Comfort::class.java to 10,
+        WCompact::class.java to 1,
+        WDetail::class.java to 2,
+        WOverview::class.java to 3,
     )
 
-    private val LAYOUTS = mapOf(
-        1 to R.layout.widget_01, 2 to R.layout.widget_02, 3 to R.layout.widget_03, 4 to R.layout.widget_04, 5 to R.layout.widget_05,
-        6 to R.layout.widget_06, 7 to R.layout.widget_07, 8 to R.layout.widget_08, 9 to R.layout.widget_09, 10 to R.layout.widget_10,
-    )
+    val NAMES = mapOf(1 to "Kompakt", 2 to "Detail", 3 to "Všetky senzory")
 
-    private val hhmm = SimpleDateFormat("HH:mm", Locale("sk", "SK"))
-    private val dayHhmm = SimpleDateFormat("d. M. HH:mm", Locale("sk", "SK"))
+    private val LAYOUTS = mapOf(1 to R.layout.widget_compact, 2 to R.layout.widget_detail, 3 to R.layout.widget_overview)
+
+    private val sk = Locale("sk", "SK")
+    private val hhmm = SimpleDateFormat("HH:mm", sk)
+    private val dayHhmm = SimpleDateFormat("d. M. HH:mm", sk)
 
     fun allWidgetIds(ctx: Context): List<Int> {
         val mgr = AppWidgetManager.getInstance(ctx)
@@ -61,37 +54,38 @@ object WidgetRenderer {
 
     private fun time(t: Long): String {
         if (t <= 0) return "–"
-        val sameDay = (System.currentTimeMillis() - t) < 20 * 3600_000L
-        return if (sameDay) hhmm.format(Date(t)) else dayHhmm.format(Date(t))
+        return if (System.currentTimeMillis() - t < 20 * 3600_000L) hhmm.format(Date(t)) else dayHhmm.format(Date(t))
     }
+
+    private fun place(d: Dev) = d.location.ifBlank { "@" + d.slug }
 
     fun render(ctx: Context, mgr: AppWidgetManager, id: Int, kind: Int, snap: Snapshot? = snapshot(ctx)) {
         val rv = RemoteViews(ctx.packageName, LAYOUTS.getValue(kind))
         val density = ctx.resources.displayMetrics.density
-        val opts = mgr.getAppWidgetOptions(id)
-        val wDp = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH).takeIf { it > 0 } ?: 250
-        val hDp = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT).takeIf { it > 0 } ?: 110
-        val scale = density.coerceAtMost(2.75f)
+        val o = mgr.getAppWidgetOptions(id)
+        val wDp = o.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH).takeIf { it > 0 } ?: 320
+        val hDp = o.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT).takeIf { it > 0 } ?: 220
+        // menšie rozlíšenie bitmáp, aby sa zmestili do limitu pre widgety
+        val scale = density.coerceAtMost(2.25f)
         val flags = Prefs.widgetOptions(ctx, id, kind)
 
         bindClicks(ctx, rv, id, snap)
+        clock(rv, flags)
 
-        if (!Prefs.isConfigured(ctx)) {
-            empty(rv, kind, "Ťukni a nastav aplikáciu")
-            info(rv, flags and (Opt.TIME or Opt.DATE), null, null)
+        val msg = when {
+            !Prefs.isConfigured(ctx) -> "Ťukni a nastav aplikáciu"
+            snap == null -> Prefs.error(ctx) ?: "Načítavam…"
+            else -> null
+        }
+        if (msg != null || snap == null) {
+            empty(rv, kind, msg ?: "Načítavam…")
             mgr.updateAppWidget(id, rv)
             return
         }
-        if (snap == null) {
-            empty(rv, kind, Prefs.error(ctx) ?: "Načítavam…")
-            info(rv, flags and (Opt.TIME or Opt.DATE), null, null)
-            mgr.updateAppWidget(id, rv)
-            return
-        }
 
-        if (kind == 9) {
-            renderAll9(rv, snap)
-            info(rv, flags and (Opt.PLACE or Opt.EXTRA or Opt.TODAY).inv(), null, snap, ctx)
+        if (kind == 3) {
+            overview(rv, snap, wDp, scale)
+            updated(rv, flags, snap, null, ctx)
             mgr.updateAppWidget(id, rv)
             return
         }
@@ -99,137 +93,86 @@ object WidgetRenderer {
         val d = snap.device(Prefs.widgetDevice(ctx, id))
         if (d == null) {
             empty(rv, kind, "Žiadne zariadenie")
-            info(rv, flags and (Opt.TIME or Opt.DATE), null, snap, ctx)
             mgr.updateAppWidget(id, rv)
             return
         }
-        val off = if (d.online) "" else " · offline"
+
+        rv.setViewVisibility(R.id.rowPlace, if (flags and Opt.PLACE != 0) View.VISIBLE else View.GONE)
+        rv.setTextViewText(R.id.tPlace, place(d))
+        rv.setTextViewText(R.id.tTemp, Fmt.temp(d.temp, false))
+        rv.setTextViewText(R.id.tHum, Fmt.hum(d.hum).replace(" %", "%").let { if (kind == 2) it.removeSuffix("%") else it })
 
         when (kind) {
             1 -> {
-                rv.setTextViewText(R.id.tName, d.name + off)
-                rv.setTextViewText(R.id.tTemp, Fmt.temp(d.temp, false))
-                rv.setTextViewText(R.id.tTrend, Fmt.trend(d.trendT, "°"))
+                rv.setTextViewText(R.id.tName, d.name + if (d.online) "" else " · offline")
+                rv.setImageViewResource(R.id.iDot, if (d.online) R.drawable.dot_online else R.drawable.dot_offline)
+                val tr = Fmt.trend(d.trendT, "° / h")
+                val today = if (d.tMin != null && flags and Opt.EXTRA != 0) "dnes ${Fmt.temp(d.tMin)}–${Fmt.temp(d.tMax)}" else ""
+                rv.setTextViewText(R.id.tTrend, listOf(tr, today).filter { it.isNotBlank() }.joinToString("  ·  "))
+                val fixed = 150 + (if (flags and Opt.PLACE != 0) 18 else 0) + (if (flags and (Opt.TIME or Opt.DATE) != 0) 34 else 0) - 50
+                val bw = ((wDp - 28) * scale).toInt()
+                val bh = ((hDp - fixed).coerceAtLeast(44) * scale).toInt()
+                rv.setImageViewBitmap(R.id.imgChart, Bitmaps.chart(d.sparkT, d.sparkH, bw, bh, scale))
             }
             2 -> {
-                rv.setTextViewText(R.id.tName, d.name + off)
-                rv.setTextViewText(R.id.tHum, d.hum?.let { String.format(Locale("sk"), "%.0f", it) } ?: "–")
-                rv.setTextViewText(R.id.tTrend, Fmt.trend(d.trendH, "%"))
-                rv.setProgressBar(R.id.pHum, 100, (d.hum ?: 0.0).toInt().coerceIn(0, 100), false)
-            }
-            3 -> {
                 rv.setTextViewText(R.id.tName, d.name)
-                rv.setTextViewText(R.id.tTemp, Fmt.temp(d.temp))
-                rv.setTextViewText(R.id.tHum, Fmt.hum(d.hum))
-                rv.setImageViewResource(R.id.iDot, if (d.online) R.drawable.dot_online else R.drawable.dot_offline)
-            }
-            4 -> {
-                rv.setTextViewText(R.id.tName, d.name)
-                rv.setTextViewText(R.id.tLocation, "@" + d.slug)
-                val color = if (d.online) 0xFF22C55E.toInt() else 0xFFEF4444.toInt()
-                rv.setTextViewText(R.id.tStatus, if (d.online) "online" else "offline")
-                rv.setTextColor(R.id.tStatus, color)
-                rv.setInt(R.id.iStatus, "setColorFilter", color)
-                rv.setTextViewText(R.id.tTemp, Fmt.temp(d.temp))
-                rv.setTextViewText(R.id.tHum, Fmt.hum(d.hum))
-                rv.setTextViewText(R.id.tTrend, Fmt.trend(d.trendT, "°"))
+                rv.setTextViewText(R.id.tStatus, if (d.online) "● online" else "● offline")
+                rv.setTextColor(R.id.tStatus, if (d.online) 0xFF22C55E.toInt() else 0xFFEF4444.toInt())
+                rv.setInt(R.id.tStatus, "setBackgroundResource", if (d.online) R.drawable.bg_pill_ok else R.drawable.bg_pill_off)
+                rv.setTextViewText(R.id.tTrendT, Fmt.trend(d.trendT, "° / h").ifBlank { " " })
+                rv.setTextViewText(R.id.tTrendH, Fmt.trend(d.trendH, "% / h").ifBlank { " " })
+                val extra = flags and Opt.EXTRA != 0
+                rv.setViewVisibility(R.id.rowStats, if (extra) View.VISIBLE else View.GONE)
+                rv.setTextViewText(R.id.tMinMax, if (d.tMin != null) "${Fmt.temp(d.tMin)}–${Fmt.temp(d.tMax)}" else "–")
+                rv.setTextViewText(R.id.tDew, Fmt.temp(d.dew) + "C")
+                rv.setTextViewText(R.id.tComfort, d.comfort ?: "–")
+                val fixed = 205 + (if (extra) 52 else 0) + (if (flags and Opt.PLACE != 0) 18 else 0) +
+                    (if (flags and (Opt.TIME or Opt.DATE) != 0) 40 else 0) - 40
                 val bw = ((wDp - 28) * scale).toInt()
-                val bh = ((hDp - 110).coerceAtLeast(30) * scale).toInt()
-                rv.setImageViewBitmap(R.id.imgChart, Bitmaps.spark(d.sparkT, Bitmaps.TEMP, bw, bh))
-            }
-            5 -> {
-                rv.setTextViewText(R.id.tName, d.name + off)
-                val bw = ((wDp - 20) * scale).toInt()
-                val bh = ((hDp - 50).coerceAtLeast(50) * scale).toInt()
-                rv.setImageViewBitmap(R.id.imgGauge, Bitmaps.gauges(d.temp, d.hum, bw, bh, scale))
-            }
-            6 -> {
-                rv.setTextViewText(R.id.tName, d.name + " · 24 h")
-                rv.setTextViewText(R.id.tTemp, Fmt.temp(d.temp))
-                rv.setTextViewText(R.id.tHum, Fmt.hum(d.hum))
-                val bw = ((wDp - 24) * scale).toInt()
-                val bh = ((hDp - 60).coerceAtLeast(50) * scale).toInt()
-                rv.setImageViewBitmap(R.id.imgChart, Bitmaps.dual(d.sparkT, d.sparkH, bw, bh, scale))
-            }
-            7 -> {
-                rv.setTextViewText(R.id.tName, "${d.name} · dnes")
-                rv.setTextViewText(R.id.tTmin, Fmt.temp(d.tMin))
-                rv.setTextViewText(R.id.tTmax, Fmt.temp(d.tMax))
-                rv.setTextViewText(R.id.tHmin, Fmt.hum(d.hMin))
-                rv.setTextViewText(R.id.tHmax, Fmt.hum(d.hMax))
-            }
-            8 -> {
-                rv.setTextViewText(R.id.tTemp, Fmt.temp(d.temp))
-                rv.setTextViewText(R.id.tHum, Fmt.hum(d.hum))
-                rv.setTextViewText(R.id.tSub, d.name + off)
-            }
-            10 -> {
-                val (emoji, bg) = when (d.comfort) {
-                    "Príjemne" -> "😊" to R.drawable.bg_good
-                    "Chladno" -> "🥶" to R.drawable.bg_cold
-                    "Teplo" -> "🥵" to R.drawable.bg_warm
-                    "Suchý vzduch" -> "🏜️" to R.drawable.bg_dry
-                    "Vlhko" -> "💧" to R.drawable.bg_humid
-                    else -> "📡" to R.drawable.bg_dark
-                }
-                rv.setInt(R.id.root, "setBackgroundResource", bg)
-                rv.setTextViewText(R.id.tName, d.name + off)
-                rv.setTextViewText(R.id.tEmoji, emoji)
-                rv.setTextViewText(R.id.tComfort, d.comfort ?: "Bez dát")
-                rv.setTextViewText(R.id.tTemp, Fmt.temp(d.temp))
-                rv.setTextViewText(R.id.tHum, Fmt.hum(d.hum))
-                rv.setTextViewText(R.id.tDew, "rosný bod ${Fmt.temp(d.dew)}")
+                val bh = ((hDp - fixed).coerceAtLeast(56) * scale).toInt()
+                rv.setImageViewBitmap(R.id.imgChart, Bitmaps.chart(d.sparkT, d.sparkH, bw, bh, scale))
             }
         }
-        info(rv, flags, d, snap, ctx)
+        updated(rv, flags, snap, d, ctx)
         mgr.updateAppWidget(id, rv)
     }
 
-    /** Spoločný blok s voliteľnými informáciami (adresa, čas, dátum, komfort, min/max, aktualizácia). */
-    private fun info(rv: RemoteViews, flags: Int, d: Dev?, snap: Snapshot?, ctx: Context? = null) {
-        fun vis(id: Int, on: Boolean) = rv.setViewVisibility(id, if (on) View.VISIBLE else View.GONE)
-
-        val place = d?.location?.takeIf { it.isNotBlank() }
-        vis(R.id.rowPlace, flags and Opt.PLACE != 0 && place != null)
-        if (place != null) rv.setTextViewText(R.id.tPlace, place)
-
+    private fun clock(rv: RemoteViews, flags: Int) {
         val t = flags and Opt.TIME != 0
         val dt = flags and Opt.DATE != 0
-        vis(R.id.rowClock, t || dt)
-        vis(R.id.grpTime, t)
-        vis(R.id.grpDate, dt)
-
-        val extra = flags and Opt.EXTRA != 0 && d != null && d.temp != null
-        vis(R.id.rowExtra, extra)
-        if (extra && d != null) rv.setTextViewText(R.id.tExtra, "Rosný bod ${Fmt.temp(d.dew)} · ${d.comfort ?: "–"}")
-
-        val today = flags and Opt.TODAY != 0 && d != null && d.tMin != null
-        vis(R.id.rowToday, today)
-        if (today && d != null) {
-            rv.setTextViewText(R.id.tToday, "Dnes ${Fmt.temp(d.tMin)}…${Fmt.temp(d.tMax)} · ${Fmt.hum(d.hMin)}…${Fmt.hum(d.hMax)}")
-        }
-
-        val upd = flags and Opt.UPDATED != 0 && snap != null
-        vis(R.id.rowUpdated, upd)
-        if (upd && snap != null) {
-            val measured = d?.ageSec?.let { snap.fetchedAt - it * 1000 }
-            val err = ctx?.let { if (Prefs.fails(it) > 0) " · offline" else "" } ?: ""
-            rv.setTextViewText(
-                R.id.tUpdatedAt,
-                "Aktualizované ${time(snap.fetchedAt)}" + (measured?.let { " · meranie ${time(it)}" } ?: "") + err
-            )
-        }
+        rv.setViewVisibility(R.id.grpTime, if (t) View.VISIBLE else View.GONE)
+        rv.setViewVisibility(R.id.grpDate, if (dt) View.VISIBLE else View.INVISIBLE)
     }
 
-    private fun renderAll9(rv: RemoteViews, snap: Snapshot) {
-        val rows = listOf(
-            arrayOf(R.id.row1, R.id.r1Dot, R.id.r1Name, R.id.r1Temp, R.id.r1Hum),
-            arrayOf(R.id.row2, R.id.r2Dot, R.id.r2Name, R.id.r2Temp, R.id.r2Hum),
-            arrayOf(R.id.row3, R.id.r3Dot, R.id.r3Name, R.id.r3Temp, R.id.r3Hum),
-            arrayOf(R.id.row4, R.id.r4Dot, R.id.r4Name, R.id.r4Temp, R.id.r4Hum),
-            arrayOf(R.id.row5, R.id.r5Dot, R.id.r5Name, R.id.r5Temp, R.id.r5Hum),
+    private fun updated(rv: RemoteViews, flags: Int, snap: Snapshot, d: Dev?, ctx: Context) {
+        val on = flags and Opt.UPDATED != 0
+        if (!on) {
+            rv.setTextViewText(R.id.tUpdatedAt, "")
+            return
+        }
+        val measured = d?.ageSec?.let { snap.fetchedAt - it * 1000 }
+        val err = if (Prefs.fails(ctx) > 0) " · bez spojenia" else ""
+        rv.setTextViewText(
+            R.id.tUpdatedAt,
+            "Aktualizované ${time(snap.fetchedAt)}" + (measured?.let { " · meranie ${time(it)}" } ?: "") + err
         )
+    }
+
+    private fun overview(rv: RemoteViews, snap: Snapshot, wDp: Int, scale: Float) {
+        val rows = listOf(
+            arrayOf(R.id.row1, R.id.r1Dot, R.id.r1Name, R.id.r1Place, R.id.r1Spark, R.id.r1Temp, R.id.r1Hum),
+            arrayOf(R.id.row2, R.id.r2Dot, R.id.r2Name, R.id.r2Place, R.id.r2Spark, R.id.r2Temp, R.id.r2Hum),
+            arrayOf(R.id.row3, R.id.r3Dot, R.id.r3Name, R.id.r3Place, R.id.r3Spark, R.id.r3Temp, R.id.r3Hum),
+            arrayOf(R.id.row4, R.id.r4Dot, R.id.r4Name, R.id.r4Place, R.id.r4Spark, R.id.r4Temp, R.id.r4Hum),
+        )
+        val online = snap.devices.count { it.online }
+        rv.setTextViewText(R.id.tCount, "$online / ${snap.devices.size} online")
+        val allOk = online == snap.devices.size && snap.devices.isNotEmpty()
+        rv.setTextColor(R.id.tCount, if (allOk) 0xFF22C55E.toInt() else 0xFFF59E0B.toInt())
+        rv.setInt(R.id.tCount, "setBackgroundResource", if (allOk) R.drawable.bg_pill_ok else R.drawable.bg_pill_off)
         rv.setViewVisibility(R.id.tEmpty, if (snap.devices.isEmpty()) View.VISIBLE else View.GONE)
+        val sw = ((wDp * 0.26f) * scale).toInt()
+        val sh = (26 * scale).toInt()
         rows.forEachIndexed { i, ids ->
             val d = snap.devices.getOrNull(i)
             if (d == null) {
@@ -238,23 +181,21 @@ object WidgetRenderer {
                 rv.setViewVisibility(ids[0], View.VISIBLE)
                 rv.setImageViewResource(ids[1], if (d.online) R.drawable.dot_online else R.drawable.dot_offline)
                 rv.setTextViewText(ids[2], d.name)
-                rv.setTextViewText(ids[3], Fmt.temp(d.temp))
-                rv.setTextViewText(ids[4], Fmt.hum(d.hum))
+                rv.setTextViewText(ids[3], place(d))
+                rv.setImageViewBitmap(ids[4], Bitmaps.spark(d.sparkT, Bitmaps.TEMP, sw, sh))
+                rv.setTextViewText(ids[5], Fmt.temp(d.temp))
+                rv.setTextViewText(ids[6], Fmt.hum(d.hum))
             }
         }
     }
 
     private fun empty(rv: RemoteViews, kind: Int, msg: String) {
-        when (kind) {
-            1 -> { rv.setTextViewText(R.id.tName, msg); rv.setTextViewText(R.id.tTemp, "–") }
-            2 -> { rv.setTextViewText(R.id.tName, msg); rv.setTextViewText(R.id.tHum, "–") }
-            8 -> rv.setTextViewText(R.id.tSub, msg)
-            9 -> { rv.setViewVisibility(R.id.tEmpty, View.VISIBLE); rv.setTextViewText(R.id.tEmpty, msg) }
-            10 -> {
-                rv.setTextViewText(R.id.tComfort, msg); rv.setTextViewText(R.id.tEmoji, "📡")
-                rv.setInt(R.id.root, "setBackgroundResource", R.drawable.bg_dark)
-            }
-            else -> rv.setTextViewText(R.id.tName, msg)
+        if (kind == 3) {
+            rv.setViewVisibility(R.id.tEmpty, View.VISIBLE)
+            rv.setTextViewText(R.id.tEmpty, msg)
+        } else {
+            rv.setTextViewText(R.id.tName, msg)
+            rv.setTextViewText(R.id.tPlace, "")
         }
     }
 
@@ -262,11 +203,9 @@ object WidgetRenderer {
         val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         val open: PendingIntent = if (Prefs.isConfigured(ctx)) {
             val url = snap?.dashboardUrl?.takeIf { it.isNotBlank() } ?: (Prefs.server(ctx) + "index.php")
-            val i = Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            PendingIntent.getActivity(ctx, 1000 + id, i, flags)
+            PendingIntent.getActivity(ctx, 1000 + id, Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), flags)
         } else {
-            val i = Intent(ctx, SettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            PendingIntent.getActivity(ctx, 1000 + id, i, flags)
+            PendingIntent.getActivity(ctx, 1000 + id, Intent(ctx, SettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), flags)
         }
         rv.setOnClickPendingIntent(R.id.root, open)
         val refresh = Intent(ctx, UpdateReceiver::class.java).setAction(UpdateReceiver.ACTION_REFRESH)

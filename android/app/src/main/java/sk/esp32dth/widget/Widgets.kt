@@ -5,7 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.os.Bundle
 
-/** Spoločný základ všetkých widgetov. */
+/** Spoločný základ widgetov. */
 abstract class BaseWidget : AppWidgetProvider() {
     abstract val kind: Int
 
@@ -32,13 +32,11 @@ abstract class BaseWidget : AppWidgetProvider() {
     }
 }
 
-class W01Temperature : BaseWidget() { override val kind = 1 }
-class W02Humidity : BaseWidget() { override val kind = 2 }
-class W03Combo : BaseWidget() { override val kind = 3 }
-class W04Card : BaseWidget() { override val kind = 4 }
-class W05Gauge : BaseWidget() { override val kind = 5 }
-class W06Chart : BaseWidget() { override val kind = 6 }
-class W07MinMax : BaseWidget() { override val kind = 7 }
-class W08Minimal : BaseWidget() { override val kind = 8 }
-class W09AllDevices : BaseWidget() { override val kind = 9 }
-class W10Comfort : BaseWidget() { override val kind = 10 }
+/** Kompakt – čas, adresa, teplota, vlhkosť a graf. */
+class WCompact : BaseWidget() { override val kind = 1 }
+
+/** Detail – hodiny, adresa, dlaždice, veľký graf, min/max, rosný bod, komfort. */
+class WDetail : BaseWidget() { override val kind = 2 }
+
+/** Všetky senzory – zoznam s adresou a minigrafom. */
+class WOverview : BaseWidget() { override val kind = 3 }

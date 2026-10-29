@@ -45,7 +45,7 @@ class WidgetConfigActivity : Activity() {
 
         // Voliteľné informácie
         val current = Prefs.widgetOptions(this, widgetId, kind)
-        val allowed = if (kind == 9) listOf(Opt.TIME, Opt.DATE, Opt.UPDATED) else Opt.ALL.map { it.first }
+        val allowed = if (kind == 3) listOf(Opt.TIME, Opt.DATE, Opt.UPDATED) else Opt.ALL.map { it.first }
         for ((flag, label) in Opt.ALL) {
             if (flag !in allowed) continue
             val cb = CheckBox(this).apply {
@@ -56,7 +56,7 @@ class WidgetConfigActivity : Activity() {
             optBox.addView(cb)
             checks += flag to cb
         }
-        if (kind == 9) {
+        if (kind == 3) {
             findViewById<View>(R.id.hDevice).visibility = View.GONE
             rg.visibility = View.GONE
         }
@@ -65,7 +65,7 @@ class WidgetConfigActivity : Activity() {
     override fun onResume() {
         super.onResume()
         if (widgetId == AppWidgetManager.INVALID_APPWIDGET_ID) return
-        if (kind == 9) {
+        if (kind == 3) {
             info.text = "Widget zobrazuje všetky tvoje senzory."
             bSave.isEnabled = true
             return
@@ -122,7 +122,7 @@ class WidgetConfigActivity : Activity() {
     }
 
     private fun save() {
-        if (kind != 9) {
+        if (kind != 3) {
             val rb = rg.findViewById<RadioButton>(rg.checkedRadioButtonId)
             val idx = rb?.tag as? Int
             val slug = idx?.let { slugs.getOrNull(it) } ?: slugs.firstOrNull()

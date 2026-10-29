@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="14dp" android:background="@drawable/bg_widget">
+  <LinearLayout android:id="@+id/rowClock" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+    <LinearLayout android:id="@+id/grpTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_vertical">
+      <TextClock android:id="@+id/clockTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:format24Hour="HH:mm" android:format12Hour="HH:mm" android:textColor="#FFFFFFFF" android:textSize="26sp" android:fontFamily="sans-serif-light" android:includeFontPadding="false" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/grpDate" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginStart="10dp">
+      <TextClock android:layout_width="wrap_content" android:layout_height="wrap_content" android:format24Hour="EEEE" android:format12Hour="EEEE" android:textColor="#FFFFFFFF" android:textSize="12sp" android:textStyle="bold" android:includeFontPadding="false" />
+      <TextClock android:id="@+id/clockDate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:format24Hour="d. MMMM yyyy" android:format12Hour="d. MMMM yyyy" android:textColor="#AAFFFFFF" android:textSize="11sp" android:includeFontPadding="false" android:layout_marginTop="2dp" />
+    </LinearLayout>
+    <ImageView android:id="@+id/btnRefresh" android:layout_width="30dp" android:layout_height="30dp" android:padding="6dp" android:background="@drawable/bg_tile" android:src="@drawable/ic_sync" android:tint="#DDFFFFFF" android:contentDescription="Obnoviť" />
+  </LinearLayout>
+  <LinearLayout android:id="@+id/rowPlace" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginTop="4dp">
+    <ImageView android:layout_width="13dp" android:layout_height="13dp" android:src="@drawable/ic_place" android:tint="#FFA5B4FC" android:importantForAccessibility="no" android:layout_marginEnd="5dp" />
+    <TextView android:id="@+id/tPlace" android:layout_width="0dp" android:layout_height="wrap_content" android:textColor="#DDFFFFFF" android:textSize="11sp" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:layout_weight="1" />
+  </LinearLayout>
+  <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginTop="8dp">
+    <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@drawable/ic_thermo" android:tint="#FFFB923C" android:importantForAccessibility="no" />
+    <TextView android:id="@+id/tTemp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFFFFF" android:textSize="34sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:text="–" android:fontFamily="sans-serif-medium" />
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#AAFFFFFF" android:textSize="15sp" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:text="°C" android:layout_marginStart="2dp" />
+    <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="end">
+      <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_vertical" android:background="@drawable/bg_tile_hum" android:paddingStart="10dp" android:paddingEnd="10dp" android:paddingTop="5dp" android:paddingBottom="5dp">
+        <ImageView android:layout_width="15dp" android:layout_height="15dp" android:src="@drawable/ic_drop" android:tint="#FF38BDF8" android:importantForAccessibility="no" android:layout_marginEnd="4dp" />
+        <TextView android:id="@+id/tHum" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFFFFF" android:textSize="17sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:text="–" />
+      </LinearLayout>
+      <TextView android:id="@+id/tTrend" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#AAFFFFFF" android:textSize="10sp" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:layout_marginTop="4dp" />
+    </LinearLayout>
+  </LinearLayout>
+  <ImageView android:id="@+id/imgChart" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:minHeight="40dp" android:layout_marginTop="8dp" android:background="@drawable/bg_chart" android:scaleType="fitXY" />
+  <LinearLayout android:id="@+id/rowUpdated" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginTop="6dp">
+    <ImageView android:id="@+id/iDot" android:layout_width="7dp" android:layout_height="7dp" android:src="@drawable/dot_offline" android:layout_marginEnd="6dp" />
+    <TextView android:id="@+id/tName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#DDFFFFFF" android:textSize="11sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" />
+    <TextView android:id="@+id/tUpdatedAt" android:layout_width="0dp" android:layout_height="wrap_content" android:textColor="#88FFFFFF" android:textSize="10sp" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:layout_weight="1" android:gravity="end" />
+  </LinearLayout>
+</LinearLayout>

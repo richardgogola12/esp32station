@@ -87,8 +87,7 @@ Ak chceš vlastný tajný kľúč, nastav v GitHube secrets `KEYSTORE_FILE`, `KE
 adresa / umiestnenie, aktuálny čas, aktuálny dátum, rosný bod a komfort, dnešné min/max, čas poslednej aktualizácie.
 Každý widget má ikony (teplota, vlhkosť, miesto, čas, dátum, aktualizácia).
 
-**10 widgetov:** Teplota · Vlhkosť · Teplota + vlhkosť · Karta zariadenia s minigrafom · Kruhové budíky ·
-Graf 24 h · Dnešné min/max · Minimalistický priehľadný · Všetky zariadenia · Komfort a rosný bod.
+**3 widgety:** Kompakt (čas, adresa, teplota, vlhkosť, graf 24 h) · Detail (hodiny, adresa, dlaždice, veľký graf, min/max, rosný bod, komfort) · Všetky senzory (zoznam s adresou a minigrafom).
 
 - Interval obnovy sa nastavuje na webe (Nastavenia → Android widgety) a aplikácia ho prevezme pri každej aktualizácii.
 - **Štart po zapnutí telefónu**: `BOOT_COMPLETED` receiver hneď vykreslí posledné hodnoty, stiahne nové a naplánuje ďalšie obnovy.

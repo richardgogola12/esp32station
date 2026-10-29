@@ -93,7 +93,7 @@
         </LinearLayout>
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp"
-            android:text="Ako pridať widget: podrž prst na ploche → Widgety → DHT Widgety → vyber jeden z 10 vzhľadov."
+            android:text="Ako pridať widget: podrž prst na ploche → Widgety → DHT Widgety → vyber Kompakt, Detail alebo Všetky senzory."
             android:textColor="@color/muted" android:textSize="13sp" android:gravity="center" />
     </LinearLayout>
 </ScrollView>

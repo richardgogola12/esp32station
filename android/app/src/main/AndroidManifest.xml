@@ -70,65 +70,23 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".W01Temperature" android:exported="false" android:label="@string/w01_label">
+        <receiver android:name=".WCompact" android:exported="false" android:label="@string/w_compact">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_01" />
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_compact" />
         </receiver>
-        <receiver android:name=".W02Humidity" android:exported="false" android:label="@string/w02_label">
+        <receiver android:name=".WDetail" android:exported="false" android:label="@string/w_detail">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_02" />
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_detail" />
         </receiver>
-        <receiver android:name=".W03Combo" android:exported="false" android:label="@string/w03_label">
+        <receiver android:name=".WOverview" android:exported="false" android:label="@string/w_overview">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_03" />
-        </receiver>
-        <receiver android:name=".W04Card" android:exported="false" android:label="@string/w04_label">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_04" />
-        </receiver>
-        <receiver android:name=".W05Gauge" android:exported="false" android:label="@string/w05_label">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_05" />
-        </receiver>
-        <receiver android:name=".W06Chart" android:exported="false" android:label="@string/w06_label">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_06" />
-        </receiver>
-        <receiver android:name=".W07MinMax" android:exported="false" android:label="@string/w07_label">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_07" />
-        </receiver>
-        <receiver android:name=".W08Minimal" android:exported="false" android:label="@string/w08_label">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_08" />
-        </receiver>
-        <receiver android:name=".W09AllDevices" android:exported="false" android:label="@string/w09_label">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_09" />
-        </receiver>
-        <receiver android:name=".W10Comfort" android:exported="false" android:label="@string/w10_label">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_10" />
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_overview" />
         </receiver>
     </application>
 </manifest>

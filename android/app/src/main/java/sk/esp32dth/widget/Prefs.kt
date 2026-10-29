@@ -64,22 +64,15 @@ object Opt {
     const val TIME = 2
     const val DATE = 4
     const val EXTRA = 8
-    const val TODAY = 16
     const val UPDATED = 32
 
     val ALL = listOf(
+        TIME to "Hodiny",
+        DATE to "Dátum",
         PLACE to "Adresa / umiestnenie",
-        TIME to "Aktuálny čas",
-        DATE to "Aktuálny dátum",
-        EXTRA to "Rosný bod a komfort",
-        TODAY to "Dnešné min / max",
+        EXTRA to "Detaily (dnes min/max, rosný bod, komfort)",
         UPDATED to "Čas poslednej aktualizácie",
     )
 
-    fun defaults(kind: Int): Int = when (kind) {
-        4 -> PLACE or TODAY or UPDATED
-        6, 9 -> UPDATED
-        8 -> TIME or DATE or UPDATED
-        else -> UPDATED
-    }
+    fun defaults(kind: Int): Int = PLACE or TIME or DATE or EXTRA or UPDATED
 }
