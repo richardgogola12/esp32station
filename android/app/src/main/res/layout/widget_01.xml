@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:gravity="center_vertical" android:padding="12dp" android:background="@drawable/bg_temp">
-    <TextView android:id="@+id/tName" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:textColor="#E6FFFFFF" android:textSize="12sp" android:maxLines="1" android:ellipsize="end" android:text="Teplota" />
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="bottom">
-        <TextView android:id="@+id/tTemp" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:textColor="#FFFFFFFF" android:textSize="34sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:text="–" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="6dp"
-            android:textColor="#E6FFFFFF" android:textSize="16sp" android:text="°C" />
-        <TextView android:id="@+id/tTrend" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
-            android:layout_marginBottom="7dp" android:gravity="end" android:textColor="#E6FFFFFF" android:textSize="12sp" android:maxLines="1" />
-    </LinearLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="top" android:padding="12dp" android:background="@drawable/bg_temp">
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+  <ImageView android:layout_width="14dp" android:layout_height="14dp" android:layout_marginEnd="5dp" android:src="@drawable/ic_thermo" android:tint="#E6FFFFFF" android:importantForAccessibility="no" />
+  <TextView android:id="@+id/tName" android:layout_width="0dp" android:layout_height="wrap_content" android:textColor="#E6FFFFFF" android:textSize="12sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:layout_weight="1" />
+</LinearLayout>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="bottom" android:layout_marginTop="2dp">
+  <TextView android:id="@+id/tTemp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFFFFF" android:textSize="32sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:text="–" android:fontFamily="sans-serif-medium" />
+  <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#E6FFFFFF" android:textSize="15sp" android:text="°C" android:layout_marginStart="2dp" />
+  <TextView android:id="@+id/tTrend" android:layout_width="0dp" android:layout_height="wrap_content" android:textColor="#E6FFFFFF" android:textSize="11sp" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:layout_weight="1" android:gravity="end" />
+</LinearLayout>
+<include layout="@layout/widget_info_block" />
 </LinearLayout>

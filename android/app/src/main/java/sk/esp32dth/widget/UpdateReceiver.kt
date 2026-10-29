@@ -28,10 +28,13 @@ class UpdateReceiver : BroadcastReceiver() {
             ACTION_ALARM, ACTION_REFRESH -> Unit
             else -> return
         }
+        val boot = intent.action != ACTION_ALARM && intent.action != ACTION_REFRESH
         val pending = goAsync()
         thread(name = "esp32dth-update") {
             try {
                 Updater.updateNow(ctx, force = intent.action == ACTION_REFRESH)
+                // Po štarte telefónu skontroluj aj novú verziu aplikácie na GitHube
+                if (boot) AppUpdater.checkInBackground(ctx)
             } finally {
                 pending.finish()
             }

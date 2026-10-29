@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:padding="12dp" android:background="@drawable/bg_dark">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
-        <TextView android:id="@+id/tName" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
-            android:textColor="#FFFFFFFF" android:textSize="13sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
-        <TextView android:id="@+id/tTemp" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:textColor="#FFFDBA74" android:textSize="15sp" android:textStyle="bold" />
-        <TextView android:id="@+id/tHum" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="10dp"
-            android:textColor="#FF7DD3FC" android:textSize="15sp" android:textStyle="bold" />
-        <ImageView android:id="@+id/btnRefresh" android:layout_width="26dp" android:layout_height="26dp" android:padding="4dp" android:src="@drawable/ic_refresh" android:contentDescription="Obnoviť" />
-    </LinearLayout>
-    <ImageView android:id="@+id/imgChart" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-        android:layout_marginTop="4dp" android:scaleType="fitXY" />
-    <TextView android:id="@+id/tUpdated" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:textColor="#77FFFFFF" android:textSize="10sp" android:text="Posledných 24 h" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="top" android:padding="12dp" android:background="@drawable/bg_dark">
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+  <ImageView android:layout_width="14dp" android:layout_height="14dp" android:layout_marginEnd="5dp" android:src="@drawable/ic_chart" android:tint="#FFA5B4FC" android:importantForAccessibility="no" />
+  <TextView android:id="@+id/tName" android:layout_width="0dp" android:layout_height="wrap_content" android:textColor="#FFFFFFFF" android:textSize="13sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:layout_weight="1" />
+  <ImageView android:layout_width="13dp" android:layout_height="13dp" android:src="@drawable/ic_thermo" android:tint="#FFFDBA74" android:importantForAccessibility="no" />
+  <TextView android:id="@+id/tTemp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFDBA74" android:textSize="14sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" />
+  <ImageView android:layout_width="12dp" android:layout_height="12dp" android:layout_marginStart="8dp" android:src="@drawable/ic_drop" android:tint="#FF7DD3FC" android:importantForAccessibility="no" />
+  <TextView android:id="@+id/tHum" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FF7DD3FC" android:textSize="14sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" />
+  <ImageView android:id="@+id/btnRefresh" android:layout_width="28dp" android:layout_height="28dp" android:padding="5dp" android:src="@drawable/ic_sync" android:tint="#CCFFFFFF" android:contentDescription="Obnoviť" />
+</LinearLayout>
+<ImageView android:id="@+id/imgChart" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginTop="4dp" android:scaleType="fitXY" />
+<include layout="@layout/widget_info_block" />
 </LinearLayout>

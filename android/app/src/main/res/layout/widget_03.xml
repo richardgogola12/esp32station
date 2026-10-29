@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:gravity="center_vertical" android:padding="12dp" android:background="@drawable/bg_dark">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
-        <ImageView android:id="@+id/iDot" android:layout_width="8dp" android:layout_height="8dp" android:src="@drawable/dot_offline" />
-        <TextView android:id="@+id/tName" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="6dp"
-            android:textColor="#CCFFFFFF" android:textSize="12sp" android:maxLines="1" android:ellipsize="end" />
-        <TextView android:id="@+id/tUpdated" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:textColor="#88FFFFFF" android:textSize="10sp" />
-    </LinearLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="2dp">
-        <TextView android:id="@+id/tTemp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
-            android:textColor="#FFFDBA74" android:textSize="28sp" android:textStyle="bold" android:maxLines="1" android:text="–" />
-        <TextView android:id="@+id/tHum" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:gravity="end"
-            android:textColor="#FF7DD3FC" android:textSize="28sp" android:textStyle="bold" android:maxLines="1" android:text="–" />
-    </LinearLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="top" android:padding="12dp" android:background="@drawable/bg_dark">
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+  <ImageView android:layout_width="14dp" android:layout_height="14dp" android:layout_marginEnd="5dp" android:src="@drawable/ic_sensor" android:tint="#E6FFFFFF" android:importantForAccessibility="no" />
+  <TextView android:id="@+id/tName" android:layout_width="0dp" android:layout_height="wrap_content" android:textColor="#E6FFFFFF" android:textSize="12sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:layout_weight="1" />
+  <ImageView android:id="@+id/iDot" android:layout_width="8dp" android:layout_height="8dp" android:src="@drawable/dot_offline" android:layout_marginStart="6dp" />
+</LinearLayout>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
+  <ImageView android:layout_width="20dp" android:layout_height="20dp" android:layout_marginEnd="2dp" android:src="@drawable/ic_thermo" android:tint="#FFFDBA74" android:importantForAccessibility="no" />
+  <TextView android:id="@+id/tTemp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFDBA74" android:textSize="24sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:text="–" android:fontFamily="sans-serif-medium" />
+  <FrameLayout android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
+  <ImageView android:layout_width="18dp" android:layout_height="18dp" android:layout_marginEnd="2dp" android:src="@drawable/ic_drop" android:tint="#FF7DD3FC" android:importantForAccessibility="no" />
+  <TextView android:id="@+id/tHum" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FF7DD3FC" android:textSize="24sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:text="–" android:fontFamily="sans-serif-medium" />
+</LinearLayout>
+<include layout="@layout/widget_info_block" />
 </LinearLayout>

@@ -1,6 +1,10 @@
 package sk.esp32dth.widget
 
+import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
+import android.appwidget.AppWidgetManager
+import android.content.pm.PackageManager
 import android.content.ClipboardManager
 import android.content.ComponentName
 import android.content.Context
@@ -13,6 +17,8 @@ import android.provider.Settings
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import java.text.DateFormat
@@ -26,6 +32,11 @@ class SettingsActivity : Activity() {
     private lateinit var tDevices: TextView
     private lateinit var tSchedule: TextView
     private lateinit var bSave: Button
+    private lateinit var bUpdate: Button
+    private lateinit var tVersion: TextView
+    private lateinit var pUpdate: ProgressBar
+    private var pendingRelease: AppUpdater.Release? = null
+    private var updateBusy = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,14 +61,125 @@ class SettingsActivity : Activity() {
             bAuto.setOnClickListener { openAutostart() }
         }
 
+        tVersion = findViewById(R.id.tVersion)
+        pUpdate = findViewById(R.id.pUpdate)
+        bUpdate = findViewById(R.id.bUpdate)
+        tVersion.text = "Nainštalovaná verzia ${AppUpdater.currentVersionName()}"
+        bUpdate.setOnClickListener { onUpdateClick() }
+
+        if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
+        }
+
         handleSetupLink(intent)
         refreshUi()
+        // Kontrola novej verzie pri každom spustení aplikácie
+        checkForUpdate(silent = !intent.getBooleanExtra("update", false))
+    }
+
+    private fun onUpdateClick() {
+        val r = pendingRelease
+        if (r == null) checkForUpdate(silent = false) else install(r)
+    }
+
+    private fun checkForUpdate(silent: Boolean) {
+        if (updateBusy) return
+        updateBusy = true
+        bUpdate.isEnabled = false
+        if (!silent) tVersion.text = "Hľadám novú verziu…"
+        val app = applicationContext
+        thread {
+            val result = runCatching { AppUpdater.check(app) }
+            runOnUiThread {
+                updateBusy = false
+                bUpdate.isEnabled = true
+                val r = result.getOrNull()
+                when {
+                    result.isFailure -> {
+                        tVersion.text = "Verzia ${AppUpdater.currentVersionName()} · kontrola zlyhala"
+                        if (!silent) Toast.makeText(this, "Nepodarilo sa spojiť s GitHubom: ${result.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
+                    }
+                    r == null -> {
+                        pendingRelease = null
+                        tVersion.text = "Verzia ${AppUpdater.currentVersionName()} · máš najnovšiu"
+                        bUpdate.text = "Skontrolovať aktualizácie"
+                        if (!silent) Toast.makeText(this, "Máš najnovšiu verziu", Toast.LENGTH_SHORT).show()
+                    }
+                    else -> {
+                        pendingRelease = r
+                        tVersion.text = "Verzia ${AppUpdater.currentVersionName()} → dostupná ${r.versionName}"
+                        bUpdate.text = "Aktualizovať na ${r.versionName}"
+                        AlertDialog.Builder(this)
+                            .setTitle("Nová verzia ${r.versionName}")
+                            .setMessage((r.notes.ifBlank { "Je dostupná nová verzia aplikácie." }) + "\n\nAktualizovať teraz?")
+                            .setPositiveButton("Aktualizovať") { _, _ -> install(r) }
+                            .setNegativeButton("Neskôr", null)
+                            .show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun install(r: AppUpdater.Release) {
+        if (!AppUpdater.canInstall(this)) {
+            Toast.makeText(this, "Povoľ aplikácii inštaláciu aktualizácií a ťukni znova na Aktualizovať", Toast.LENGTH_LONG).show()
+            try {
+                startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
+            } catch (e: Exception) { openAppDetails() }
+            return
+        }
+        if (updateBusy) return
+        updateBusy = true
+        bUpdate.isEnabled = false
+        pUpdate.progress = 0
+        pUpdate.visibility = View.VISIBLE
+        tVersion.text = "Sťahujem verziu ${r.versionName}…"
+        val app = applicationContext
+        thread {
+            val res = runCatching { AppUpdater.downloadAndInstall(app, r) { p -> runOnUiThread { pUpdate.progress = p } } }
+            runOnUiThread {
+                updateBusy = false
+                bUpdate.isEnabled = true
+                pUpdate.visibility = View.GONE
+                tVersion.text = if (res.isSuccess) "Potvrď inštaláciu v okne systému" else "Sťahovanie zlyhalo: ${res.exceptionOrNull()?.message}"
+            }
+        }
+    }
+
+    /** Zoznam widgetov na ploche – ťuknutím sa otvorí ich nastavenie. */
+    private fun refreshWidgetList() {
+        val box = findViewById<LinearLayout>(R.id.widgetList)
+        box.removeAllViews()
+        val snap = WidgetRenderer.snapshot(this)
+        val names = mapOf(1 to "Teplota", 2 to "Vlhkosť", 3 to "Teplota + vlhkosť", 4 to "Karta zariadenia", 5 to "Budíky",
+            6 to "Graf 24 h", 7 to "Dnešné min / max", 8 to "Minimalistický", 9 to "Všetky zariadenia", 10 to "Komfort")
+        val ids = WidgetRenderer.allWidgetIds(this)
+        if (ids.isEmpty()) {
+            box.addView(TextView(this).apply { text = "Na ploche zatiaľ nemáš žiadny widget."; setTextColor(getColor(R.color.muted)) })
+            return
+        }
+        for (id in ids) {
+            val kind = WidgetRenderer.kindOf(this, id) ?: continue
+            val dev = if (kind == 9) "všetky senzory" else snap?.device(Prefs.widgetDevice(this, id))?.name ?: "–"
+            val b = Button(this, null, 0, android.R.style.Widget_Material_Button_Borderless_Colored).apply {
+                text = "✎  ${names[kind]} · $dev"
+                isAllCaps = false
+                textAlignment = View.TEXT_ALIGNMENT_VIEW_START
+                setOnClickListener {
+                    startActivity(Intent(this@SettingsActivity, WidgetConfigActivity::class.java)
+                        .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id))
+                }
+            }
+            box.addView(b)
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
         handleSetupLink(intent)
+        if (intent.getBooleanExtra("update", false)) checkForUpdate(silent = false)
     }
 
     override fun onResume() {
@@ -116,6 +238,7 @@ class SettingsActivity : Activity() {
     }
 
     private fun refreshUi() {
+        refreshWidgetList()
         val snap = WidgetRenderer.snapshot(this)
         tDevices.text = if (snap == null || snap.devices.isEmpty()) {
             if (Prefs.isConfigured(this)) "Zatiaľ žiadne dáta" else "Najprv nastav pripojenie"

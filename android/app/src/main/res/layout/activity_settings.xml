@@ -16,6 +16,23 @@
             </LinearLayout>
         </LinearLayout>
 
+        <LinearLayout android:id="@+id/cardUpdate" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
+            android:background="@drawable/bg_card_theme" android:padding="16dp" android:layout_marginBottom="14dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
+                <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_download" android:tint="#6366F1" />
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginStart="10dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Aktualizácia aplikácie"
+                        android:textStyle="bold" android:textSize="16sp" android:textColor="@color/text" />
+                    <TextView android:id="@+id/tVersion" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:textColor="@color/muted" android:textSize="13sp" />
+                </LinearLayout>
+            </LinearLayout>
+            <ProgressBar android:id="@+id/pUpdate" style="@android:style/Widget.Material.ProgressBar.Horizontal" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:layout_marginTop="8dp" android:max="100" android:visibility="gone" />
+            <Button android:id="@+id/bUpdate" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:text="Skontrolovať aktualizácie" />
+        </LinearLayout>
+
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
             android:background="@drawable/bg_card_theme" android:padding="16dp">
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pripojenie k serveru"
@@ -49,6 +66,17 @@
                 android:layout_marginTop="8dp" android:textColor="@color/muted" android:textSize="12sp" />
             <Button android:id="@+id/bRefresh" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="6dp" android:text="Aktualizovať widgety teraz" />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
+            android:background="@drawable/bg_card_theme" android:padding="16dp" android:layout_marginTop="14dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Moje widgety"
+                android:textStyle="bold" android:textSize="16sp" android:textColor="@color/text" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+                android:text="Ťukni na widget a zmeň zariadenie alebo zobrazené údaje (adresa, čas, dátum, rosný bod…)."
+                android:textColor="@color/muted" android:textSize="13sp" />
+            <LinearLayout android:id="@+id/widgetList" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:layout_marginTop="6dp" />
         </LinearLayout>
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"

@@ -16,3 +16,6 @@ android/.idea/
 *.jks
 
 .DS_Store
+
+# Podpisový kľúč Android aplikácie (nutný pre updater) – zámerne v repozitári
+!android/app/signing/release.keystore

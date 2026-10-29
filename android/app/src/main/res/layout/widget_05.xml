@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:padding="10dp" android:background="@drawable/bg_dark">
-    <TextView android:id="@+id/tName" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
-        android:textColor="#CCFFFFFF" android:textSize="12sp" android:maxLines="1" android:ellipsize="end" />
-    <ImageView android:id="@+id/imgGauge" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-        android:scaleType="fitCenter" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="top" android:padding="10dp" android:background="@drawable/bg_dark">
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+  <ImageView android:layout_width="14dp" android:layout_height="14dp" android:layout_marginEnd="5dp" android:src="@drawable/ic_sensor" android:tint="#E6FFFFFF" android:importantForAccessibility="no" />
+  <TextView android:id="@+id/tName" android:layout_width="0dp" android:layout_height="wrap_content" android:textColor="#E6FFFFFF" android:textSize="12sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:layout_weight="1" />
+</LinearLayout>
+<ImageView android:id="@+id/imgGauge" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitCenter" />
+<include layout="@layout/widget_info_block" />
 </LinearLayout>

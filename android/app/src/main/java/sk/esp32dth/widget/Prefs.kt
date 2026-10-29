@@ -47,5 +47,39 @@ object Prefs {
 
     fun widgetDevice(c: Context, id: Int): String? = sp(c).getString("w_$id", null)
     fun setWidgetDevice(c: Context, id: Int, slug: String) = sp(c).edit().putString("w_$id", slug).apply()
-    fun removeWidget(c: Context, id: Int) = sp(c).edit().remove("w_$id").apply()
+    fun removeWidget(c: Context, id: Int) = sp(c).edit().remove("w_$id").remove("o_$id").apply()
+
+    /** Voliteľné informácie vo widgete (bitová maska Opt.*). */
+    fun widgetOptions(c: Context, id: Int, kind: Int): Int = sp(c).getInt("o_$id", Opt.defaults(kind))
+    fun setWidgetOptions(c: Context, id: Int, opts: Int) = sp(c).edit().putInt("o_$id", opts).apply()
+
+    fun lastUpdateCheck(c: Context): Long = sp(c).getLong("upd_check", 0L)
+    fun setLastUpdateCheck(c: Context, t: Long) = sp(c).edit().putLong("upd_check", t).apply()
+    fun notifiedVersion(c: Context): Int = sp(c).getInt("upd_notified", 0)
+    fun setNotifiedVersion(c: Context, v: Int) = sp(c).edit().putInt("upd_notified", v).apply()
+}
+
+object Opt {
+    const val PLACE = 1
+    const val TIME = 2
+    const val DATE = 4
+    const val EXTRA = 8
+    const val TODAY = 16
+    const val UPDATED = 32
+
+    val ALL = listOf(
+        PLACE to "Adresa / umiestnenie",
+        TIME to "Aktuálny čas",
+        DATE to "Aktuálny dátum",
+        EXTRA to "Rosný bod a komfort",
+        TODAY to "Dnešné min / max",
+        UPDATED to "Čas poslednej aktualizácie",
+    )
+
+    fun defaults(kind: Int): Int = when (kind) {
+        4 -> PLACE or TODAY or UPDATED
+        6, 9 -> UPDATED
+        8 -> TIME or DATE or UPDATED
+        else -> UPDATED
+    }
 }

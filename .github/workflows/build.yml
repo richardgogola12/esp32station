@@ -35,7 +35,10 @@ jobs:
         working-directory: android
         run: |
           set -o pipefail
-          gradle --no-daemon --stacktrace assembleDebug assembleRelease 2>&1 | tee ../gradle.log
+          VC=$((100 + ${{ github.run_number }}))
+          echo "VERSION_CODE=$VC" >> $GITHUB_ENV
+          echo "VERSION_NAME=1.1.${{ github.run_number }}" >> $GITHUB_ENV
+          gradle --no-daemon --stacktrace -PversionCode=$VC -PversionName=1.1.${{ github.run_number }} assembleRelease 2>&1 | tee ../gradle.log
 
       - name: Report build errors
         if: failure()
@@ -47,25 +50,37 @@ jobs:
         run: |
           mkdir -p out
           cp android/app/build/outputs/apk/release/app-release.apk out/esp32dth-widgety.apk
-          cp android/app/build/outputs/apk/debug/app-debug.apk out/esp32dth-widgety-debug.apk
+          NOTES=$(git log -1 --pretty=%s | head -c 300)
+          python3 - "$NOTES" <<'PY'
+          import json, os, sys
+          json.dump({
+              "versionCode": int(os.environ["VERSION_CODE"]),
+              "versionName": os.environ["VERSION_NAME"],
+              "apk": "https://github.com/${{ github.repository }}/releases/download/v" + os.environ["VERSION_NAME"] + "/esp32dth-widgety.apk",
+              "notes": sys.argv[1],
+          }, open("out/version.json", "w"), ensure_ascii=False)
+          PY
+          cat out/version.json
 
       - uses: actions/upload-artifact@v4
         with:
           name: esp32dth-widgety-apk
-          path: out/*.apk
+          path: out/*
 
       - name: Publish release "latest"
         if: github.event_name != 'pull_request'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest
-          name: DHT Widgety – posledná verzia
+          tag_name: v${{ env.VERSION_NAME }}
+          name: DHT Widgety ${{ env.VERSION_NAME }}
           body: |
             Automaticky zostavená Android aplikácia s 10 widgetmi.
             Stiahni **esp32dth-widgety.apk** a nainštaluj do telefónu (povoľ inštaláciu z neznámych zdrojov).
           prerelease: false
           make_latest: true
-          files: out/esp32dth-widgety.apk
+          files: |
+            out/esp32dth-widgety.apk
+            out/version.json
 
   esp32:
     name: ESP32 firmvér

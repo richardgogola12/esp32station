@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:gravity="center" android:paddingStart="16dp" android:paddingEnd="16dp" android:background="@drawable/bg_minimal">
-    <TextView android:id="@+id/tLine" android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:textColor="#FFFFFFFF" android:textSize="26sp" android:fontFamily="sans-serif-light" android:maxLines="1"
-        android:shadowColor="#AA000000" android:shadowRadius="6" android:text="–" />
-    <TextView android:id="@+id/tSub" android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:textColor="#DDFFFFFF" android:textSize="12sp" android:maxLines="1" android:shadowColor="#AA000000" android:shadowRadius="4" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center" android:padding="12dp" android:background="@drawable/bg_minimal">
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center">
+  <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_thermo" android:tint="#FFFFFFFF" android:importantForAccessibility="no" />
+  <TextView android:id="@+id/tTemp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFFFFF" android:textSize="26sp" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:text="–" android:fontFamily="sans-serif-light" android:shadowColor="#AA000000" android:shadowRadius="6" />
+  <ImageView android:layout_width="20dp" android:layout_height="20dp" android:layout_marginStart="14dp" android:src="@drawable/ic_drop" android:tint="#FFFFFFFF" android:importantForAccessibility="no" />
+  <TextView android:id="@+id/tHum" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFFFFF" android:textSize="26sp" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:text="–" android:fontFamily="sans-serif-light" android:shadowColor="#AA000000" android:shadowRadius="6" />
+</LinearLayout>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center">
+  <ImageView android:layout_width="11dp" android:layout_height="11dp" android:layout_marginEnd="4dp" android:src="@drawable/ic_sensor" android:tint="#DDFFFFFF" android:importantForAccessibility="no" />
+  <TextView android:id="@+id/tSub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#DDFFFFFF" android:textSize="12sp" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:shadowColor="#AA000000" android:shadowRadius="6" />
+</LinearLayout>
+<include layout="@layout/widget_info_block" />
 </LinearLayout>

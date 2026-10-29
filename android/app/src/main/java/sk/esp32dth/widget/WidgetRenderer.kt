@@ -8,6 +8,9 @@ import android.content.Intent
 import android.net.Uri
 import android.view.View
 import android.widget.RemoteViews
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /** Vykresľuje všetkých 10 typov widgetov z posledných uložených dát. */
 object WidgetRenderer {
@@ -30,9 +33,17 @@ object WidgetRenderer {
         6 to R.layout.widget_06, 7 to R.layout.widget_07, 8 to R.layout.widget_08, 9 to R.layout.widget_09, 10 to R.layout.widget_10,
     )
 
+    private val hhmm = SimpleDateFormat("HH:mm", Locale("sk", "SK"))
+    private val dayHhmm = SimpleDateFormat("d. M. HH:mm", Locale("sk", "SK"))
+
     fun allWidgetIds(ctx: Context): List<Int> {
         val mgr = AppWidgetManager.getInstance(ctx)
         return PROVIDERS.flatMap { (cls, _) -> mgr.getAppWidgetIds(ComponentName(ctx, cls)).toList() }
+    }
+
+    fun kindOf(ctx: Context, id: Int): Int? {
+        val provider = AppWidgetManager.getInstance(ctx).getAppWidgetInfo(id)?.provider?.className ?: return null
+        return PROVIDERS.firstOrNull { it.first.name == provider }?.second
     }
 
     fun renderAll(ctx: Context) {
@@ -48,6 +59,12 @@ object WidgetRenderer {
         return try { Snapshot.parse(json, Prefs.fetchedAt(ctx)) } catch (e: Exception) { null }
     }
 
+    private fun time(t: Long): String {
+        if (t <= 0) return "–"
+        val sameDay = (System.currentTimeMillis() - t) < 20 * 3600_000L
+        return if (sameDay) hhmm.format(Date(t)) else dayHhmm.format(Date(t))
+    }
+
     fun render(ctx: Context, mgr: AppWidgetManager, id: Int, kind: Int, snap: Snapshot? = snapshot(ctx)) {
         val rv = RemoteViews(ctx.packageName, LAYOUTS.getValue(kind))
         val density = ctx.resources.displayMetrics.density
@@ -55,22 +72,26 @@ object WidgetRenderer {
         val wDp = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH).takeIf { it > 0 } ?: 250
         val hDp = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT).takeIf { it > 0 } ?: 110
         val scale = density.coerceAtMost(2.75f)
+        val flags = Prefs.widgetOptions(ctx, id, kind)
 
         bindClicks(ctx, rv, id, snap)
 
         if (!Prefs.isConfigured(ctx)) {
             empty(rv, kind, "Ťukni a nastav aplikáciu")
+            info(rv, flags and (Opt.TIME or Opt.DATE), null, null)
             mgr.updateAppWidget(id, rv)
             return
         }
         if (snap == null) {
             empty(rv, kind, Prefs.error(ctx) ?: "Načítavam…")
+            info(rv, flags and (Opt.TIME or Opt.DATE), null, null)
             mgr.updateAppWidget(id, rv)
             return
         }
 
         if (kind == 9) {
-            renderAll9(ctx, rv, snap)
+            renderAll9(rv, snap)
+            info(rv, flags and (Opt.PLACE or Opt.EXTRA or Opt.TODAY).inv(), null, snap, ctx)
             mgr.updateAppWidget(id, rv)
             return
         }
@@ -78,21 +99,21 @@ object WidgetRenderer {
         val d = snap.device(Prefs.widgetDevice(ctx, id))
         if (d == null) {
             empty(rv, kind, "Žiadne zariadenie")
+            info(rv, flags and (Opt.TIME or Opt.DATE), null, snap, ctx)
             mgr.updateAppWidget(id, rv)
             return
         }
-        val age = Fmt.ageNow(d, snap)
-        val stale = !d.online
+        val off = if (d.online) "" else " · offline"
 
         when (kind) {
             1 -> {
-                rv.setTextViewText(R.id.tName, d.name + if (stale) " · offline" else "")
+                rv.setTextViewText(R.id.tName, d.name + off)
                 rv.setTextViewText(R.id.tTemp, Fmt.temp(d.temp, false))
                 rv.setTextViewText(R.id.tTrend, Fmt.trend(d.trendT, "°"))
             }
             2 -> {
-                rv.setTextViewText(R.id.tName, d.name + if (stale) " · offline" else "")
-                rv.setTextViewText(R.id.tHum, d.hum?.let { String.format(java.util.Locale("sk"), "%.0f", it) } ?: "–")
+                rv.setTextViewText(R.id.tName, d.name + off)
+                rv.setTextViewText(R.id.tHum, d.hum?.let { String.format(Locale("sk"), "%.0f", it) } ?: "–")
                 rv.setTextViewText(R.id.tTrend, Fmt.trend(d.trendH, "%"))
                 rv.setProgressBar(R.id.pHum, 100, (d.hum ?: 0.0).toInt().coerceIn(0, 100), false)
             }
@@ -100,33 +121,32 @@ object WidgetRenderer {
                 rv.setTextViewText(R.id.tName, d.name)
                 rv.setTextViewText(R.id.tTemp, Fmt.temp(d.temp))
                 rv.setTextViewText(R.id.tHum, Fmt.hum(d.hum))
-                rv.setTextViewText(R.id.tUpdated, age)
                 rv.setImageViewResource(R.id.iDot, if (d.online) R.drawable.dot_online else R.drawable.dot_offline)
             }
             4 -> {
                 rv.setTextViewText(R.id.tName, d.name)
-                rv.setTextViewText(R.id.tLocation, d.location.ifBlank { "@" + d.slug })
-                rv.setTextViewText(R.id.tStatus, if (d.online) "● online" else "● offline")
-                rv.setTextColor(R.id.tStatus, if (d.online) 0xFF22C55E.toInt() else 0xFFEF4444.toInt())
+                rv.setTextViewText(R.id.tLocation, "@" + d.slug)
+                val color = if (d.online) 0xFF22C55E.toInt() else 0xFFEF4444.toInt()
+                rv.setTextViewText(R.id.tStatus, if (d.online) "online" else "offline")
+                rv.setTextColor(R.id.tStatus, color)
+                rv.setInt(R.id.iStatus, "setColorFilter", color)
                 rv.setTextViewText(R.id.tTemp, Fmt.temp(d.temp))
                 rv.setTextViewText(R.id.tHum, Fmt.hum(d.hum))
-                rv.setTextViewText(R.id.tMinMax, if (d.tMin != null) "dnes ${Fmt.temp(d.tMin)} – ${Fmt.temp(d.tMax)}\n${Fmt.hum(d.hMin)} – ${Fmt.hum(d.hMax)}" else "")
-                rv.setTextViewText(R.id.tUpdated, "Aktualizované $age")
+                rv.setTextViewText(R.id.tTrend, Fmt.trend(d.trendT, "°"))
                 val bw = ((wDp - 28) * scale).toInt()
-                val bh = ((hDp - 95).coerceAtLeast(30) * scale).toInt()
+                val bh = ((hDp - 110).coerceAtLeast(30) * scale).toInt()
                 rv.setImageViewBitmap(R.id.imgChart, Bitmaps.spark(d.sparkT, Bitmaps.TEMP, bw, bh))
             }
             5 -> {
-                rv.setTextViewText(R.id.tName, d.name + if (stale) " · offline" else "")
+                rv.setTextViewText(R.id.tName, d.name + off)
                 val bw = ((wDp - 20) * scale).toInt()
-                val bh = ((hDp - 40).coerceAtLeast(50) * scale).toInt()
+                val bh = ((hDp - 50).coerceAtLeast(50) * scale).toInt()
                 rv.setImageViewBitmap(R.id.imgGauge, Bitmaps.gauges(d.temp, d.hum, bw, bh, scale))
             }
             6 -> {
-                rv.setTextViewText(R.id.tName, d.name)
+                rv.setTextViewText(R.id.tName, d.name + " · 24 h")
                 rv.setTextViewText(R.id.tTemp, Fmt.temp(d.temp))
                 rv.setTextViewText(R.id.tHum, Fmt.hum(d.hum))
-                rv.setTextViewText(R.id.tUpdated, "Posledných 24 h · $age")
                 val bw = ((wDp - 24) * scale).toInt()
                 val bh = ((hDp - 60).coerceAtLeast(50) * scale).toInt()
                 rv.setImageViewBitmap(R.id.imgChart, Bitmaps.dual(d.sparkT, d.sparkH, bw, bh, scale))
@@ -139,8 +159,9 @@ object WidgetRenderer {
                 rv.setTextViewText(R.id.tHmax, Fmt.hum(d.hMax))
             }
             8 -> {
-                rv.setTextViewText(R.id.tLine, "${Fmt.temp(d.temp)}  ·  ${Fmt.hum(d.hum)}")
-                rv.setTextViewText(R.id.tSub, "${d.name} · $age")
+                rv.setTextViewText(R.id.tTemp, Fmt.temp(d.temp))
+                rv.setTextViewText(R.id.tHum, Fmt.hum(d.hum))
+                rv.setTextViewText(R.id.tSub, d.name + off)
             }
             10 -> {
                 val (emoji, bg) = when (d.comfort) {
@@ -152,16 +173,55 @@ object WidgetRenderer {
                     else -> "📡" to R.drawable.bg_dark
                 }
                 rv.setInt(R.id.root, "setBackgroundResource", bg)
+                rv.setTextViewText(R.id.tName, d.name + off)
                 rv.setTextViewText(R.id.tEmoji, emoji)
                 rv.setTextViewText(R.id.tComfort, d.comfort ?: "Bez dát")
-                rv.setTextViewText(R.id.tDew, "${Fmt.temp(d.temp)} · ${Fmt.hum(d.hum)} · rosný bod ${Fmt.temp(d.dew)}")
-                rv.setTextViewText(R.id.tName, d.name + if (stale) " · offline" else "")
+                rv.setTextViewText(R.id.tTemp, Fmt.temp(d.temp))
+                rv.setTextViewText(R.id.tHum, Fmt.hum(d.hum))
+                rv.setTextViewText(R.id.tDew, "rosný bod ${Fmt.temp(d.dew)}")
             }
         }
+        info(rv, flags, d, snap, ctx)
         mgr.updateAppWidget(id, rv)
     }
 
-    private fun renderAll9(ctx: Context, rv: RemoteViews, snap: Snapshot) {
+    /** Spoločný blok s voliteľnými informáciami (adresa, čas, dátum, komfort, min/max, aktualizácia). */
+    private fun info(rv: RemoteViews, flags: Int, d: Dev?, snap: Snapshot?, ctx: Context? = null) {
+        fun vis(id: Int, on: Boolean) = rv.setViewVisibility(id, if (on) View.VISIBLE else View.GONE)
+
+        val place = d?.location?.takeIf { it.isNotBlank() }
+        vis(R.id.rowPlace, flags and Opt.PLACE != 0 && place != null)
+        if (place != null) rv.setTextViewText(R.id.tPlace, place)
+
+        val t = flags and Opt.TIME != 0
+        val dt = flags and Opt.DATE != 0
+        vis(R.id.rowClock, t || dt)
+        vis(R.id.grpTime, t)
+        vis(R.id.grpDate, dt)
+
+        val extra = flags and Opt.EXTRA != 0 && d != null && d.temp != null
+        vis(R.id.rowExtra, extra)
+        if (extra && d != null) rv.setTextViewText(R.id.tExtra, "Rosný bod ${Fmt.temp(d.dew)} · ${d.comfort ?: "–"}")
+
+        val today = flags and Opt.TODAY != 0 && d != null && d.tMin != null
+        vis(R.id.rowToday, today)
+        if (today && d != null) {
+            rv.setTextViewText(R.id.tToday, "Dnes ${Fmt.temp(d.tMin)}…${Fmt.temp(d.tMax)} · ${Fmt.hum(d.hMin)}…${Fmt.hum(d.hMax)}")
+        }
+
+        val upd = flags and Opt.UPDATED != 0 && snap != null
+        vis(R.id.rowUpdated, upd)
+        if (upd && snap != null) {
+            val measured = d?.ageSec?.let { snap.fetchedAt - it * 1000 }
+            val err = ctx?.let { if (Prefs.fails(it) > 0) " · offline" else "" } ?: ""
+            rv.setTextViewText(
+                R.id.tUpdatedAt,
+                "Aktualizované ${time(snap.fetchedAt)}" + (measured?.let { " · meranie ${time(it)}" } ?: "") + err
+            )
+        }
+    }
+
+    private fun renderAll9(rv: RemoteViews, snap: Snapshot) {
         val rows = listOf(
             arrayOf(R.id.row1, R.id.r1Dot, R.id.r1Name, R.id.r1Temp, R.id.r1Hum),
             arrayOf(R.id.row2, R.id.r2Dot, R.id.r2Name, R.id.r2Temp, R.id.r2Hum),
@@ -182,17 +242,18 @@ object WidgetRenderer {
                 rv.setTextViewText(ids[4], Fmt.hum(d.hum))
             }
         }
-        val mins = ((System.currentTimeMillis() - snap.fetchedAt) / 60000).coerceAtLeast(0)
-        rv.setTextViewText(R.id.tUpdated, if (mins < 1) "teraz" else "pred $mins min")
     }
 
     private fun empty(rv: RemoteViews, kind: Int, msg: String) {
         when (kind) {
             1 -> { rv.setTextViewText(R.id.tName, msg); rv.setTextViewText(R.id.tTemp, "–") }
             2 -> { rv.setTextViewText(R.id.tName, msg); rv.setTextViewText(R.id.tHum, "–") }
-            8 -> { rv.setTextViewText(R.id.tLine, "–"); rv.setTextViewText(R.id.tSub, msg) }
+            8 -> rv.setTextViewText(R.id.tSub, msg)
             9 -> { rv.setViewVisibility(R.id.tEmpty, View.VISIBLE); rv.setTextViewText(R.id.tEmpty, msg) }
-            10 -> { rv.setTextViewText(R.id.tComfort, msg); rv.setTextViewText(R.id.tEmoji, "📡"); rv.setInt(R.id.root, "setBackgroundResource", R.drawable.bg_dark) }
+            10 -> {
+                rv.setTextViewText(R.id.tComfort, msg); rv.setTextViewText(R.id.tEmoji, "📡")
+                rv.setInt(R.id.root, "setBackgroundResource", R.drawable.bg_dark)
+            }
             else -> rv.setTextViewText(R.id.tName, msg)
         }
     }
