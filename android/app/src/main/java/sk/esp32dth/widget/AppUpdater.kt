@@ -26,7 +26,7 @@ object AppUpdater {
     class Release(val versionCode: Int, val versionName: String, val apkUrl: String, val notes: String)
 
     fun currentVersionCode(): Int = BuildConfig.VERSION_CODE
-    fun currentVersionName(): String = BuildConfig.VERSION_NAME
+    fun currentVersionName(): String = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
 
     private fun open(url: String, timeout: Int): HttpURLConnection {
         var u = URL(url)
@@ -153,6 +153,10 @@ class InstallReceiver : BroadcastReceiver() {
                 context.startActivity(confirm)
             }
             PackageInstaller.STATUS_SUCCESS -> Toast.makeText(context, "Aplikácia bola aktualizovaná", Toast.LENGTH_LONG).show()
+            PackageInstaller.STATUS_FAILURE_CONFLICT, PackageInstaller.STATUS_FAILURE_INCOMPATIBLE -> Toast.makeText(context,
+                "Nová verzia je podpísaná iným kľúčom ako nainštalovaná. Odinštaluj aplikáciu a nainštaluj ju znova z GitHubu – potom už aktualizácie pôjdu.",
+                Toast.LENGTH_LONG).show()
+            PackageInstaller.STATUS_FAILURE_ABORTED -> Toast.makeText(context, "Inštalácia bola zrušená", Toast.LENGTH_SHORT).show()
             else -> {
                 val msg = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE) ?: "neznáma chyba"
                 Toast.makeText(context, "Aktualizácia zlyhala: $msg", Toast.LENGTH_LONG).show()

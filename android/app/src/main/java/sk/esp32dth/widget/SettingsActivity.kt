@@ -107,7 +107,7 @@ class SettingsActivity : Activity() {
                     }
                     else -> {
                         pendingRelease = r
-                        tVersion.text = "Verzia ${AppUpdater.currentVersionName()} → dostupná ${r.versionName}"
+                        tVersion.text = "Verzia ${AppUpdater.currentVersionName()} → dostupná ${r.versionName} (${r.versionCode})"
                         bUpdate.text = "Aktualizovať na ${r.versionName}"
                         AlertDialog.Builder(this)
                             .setTitle("Nová verzia ${r.versionName}")
