@@ -38,12 +38,18 @@ function devices_summary(array $devices): array
 
     $hourAgo = date('Y-m-d H:i:s', time() - 3600);
     $prev = db()->prepare('SELECT temperature, humidity FROM ' . t('readings') . ' WHERE device_id = ? AND created_at <= ? ORDER BY created_at DESC LIMIT 1');
+    // hodnota spred 24 h (v okne ±40 min, aby sa neporovnávalo s veľmi starým meraním)
+    $yest = db()->prepare('SELECT temperature, humidity FROM ' . t('readings') . ' WHERE device_id = ? AND created_at BETWEEN ? AND ? ORDER BY created_at DESC LIMIT 1');
+    $yFrom = date('Y-m-d H:i:s', time() - 86400 - 2400);
+    $yTo = date('Y-m-d H:i:s', time() - 86400 + 2400);
 
     $out = [];
     foreach ($devices as $d) {
         $id = (int)$d['id'];
         $prev->execute([$id, $hourAgo]);
         $p = $prev->fetch() ?: null;
+        $yest->execute([$id, $yFrom, $yTo]);
+        $y = $yest->fetch() ?: null;
         $t = $d['last_temperature'] !== null ? (float)$d['last_temperature'] : null;
         $h = $d['last_humidity'] !== null ? (float)$d['last_humidity'] : null;
         $out[] = [
@@ -64,6 +70,13 @@ function devices_summary(array $devices): array
             'trend_h'     => ($p && $h !== null) ? round($h - (float)$p['humidity'], 1) : null,
             'dew_point'   => ($t !== null && $h !== null) ? dew_point($t, $h) : null,
             'comfort'     => ($t !== null && $h !== null) ? comfort_label($t, $h) : null,
+            'yesterday_t' => $y ? round((float)$y['temperature'], 1) : null,
+            'yesterday_h' => $y ? round((float)$y['humidity'], 1) : null,
+            'vs_yesterday_t' => ($y && $t !== null) ? round($t - (float)$y['temperature'], 1) : null,
+            'vs_yesterday_h' => ($y && $h !== null) ? round($h - (float)$y['humidity'], 1) : null,
+            'feels_like'  => ($t !== null && $h !== null) ? feels_like($t, $h) : null,
+            'abs_humidity' => ($t !== null && $h !== null) ? abs_humidity($t, $h) : null,
+            'tip'         => ($t !== null && $h !== null) ? air_tip($t, $h) : null,
             'today'       => isset($today[$id]) ? [
                 'tmin' => round((float)$today[$id]['tmin'], 1),
                 'tmax' => round((float)$today[$id]['tmax'], 1),
@@ -86,6 +99,32 @@ function dew_point(float $t, float $h): ?float
     $a = 17.62; $b = 243.12;
     $g = ($a * $t) / ($b + $t) + log($h / 100.0);
     return round(($b * $g) / ($a - $g), 1);
+}
+
+/** Pocitová teplota (Apparent Temperature, bez vetra – vhodná do interiéru). */
+function feels_like(float $t, float $h): float
+{
+    $e = $h / 100 * 6.105 * exp(17.27 * $t / (237.7 + $t));
+    return round($t + 0.33 * $e - 4.0, 1);
+}
+
+/** Absolútna vlhkosť v g/m³. */
+function abs_humidity(float $t, float $h): float
+{
+    return round(6.112 * exp(17.67 * $t / ($t + 243.5)) * $h * 2.1674 / (273.15 + $t), 1);
+}
+
+/** Krátky praktický tip podľa teploty a vlhkosti. */
+function air_tip(float $t, float $h): array
+{
+    $dew = dew_point($t, $h);
+    if ($h >= 70) return ['icon' => '🪟', 'text' => 'Vyvetraj – vysoká vlhkosť, riziko plesne'];
+    if ($dew !== null && $t - $dew < 4) return ['icon' => '💧', 'text' => 'Riziko kondenzácie na oknách'];
+    if ($h >= 60) return ['icon' => '🌬️', 'text' => 'Vlhkosť stúpa – oplatí sa vyvetrať'];
+    if ($h < 30) return ['icon' => '🏜️', 'text' => 'Suchý vzduch – zvlhči miestnosť'];
+    if ($t > 26) return ['icon' => '🌡️', 'text' => 'Teplo – vyvetraj alebo zatieň'];
+    if ($t < 18) return ['icon' => '🧣', 'text' => 'Chladno – prikúr'];
+    return ['icon' => '👌', 'text' => 'Ideálne podmienky'];
 }
 
 function comfort_label(float $t, float $h): string
@@ -231,6 +270,84 @@ function stats(array $f): array
             'tmin' => round((float)$r['tmin'], 1), 'tmax' => round((float)$r['tmax'], 1), 'tavg' => round((float)$r['tavg'], 1),
             'hmin' => round((float)$r['hmin'], 1), 'hmax' => round((float)$r['hmax'], 1), 'havg' => round((float)$r['havg'], 1),
             'first_at' => $r['first_at'], 'last_at' => $r['last_at'],
+        ];
+    }
+    return $out;
+}
+
+/**
+ * Dve obdobia na porovnanie: A (zvolené) a B (predchádzajúce rovnako dlhé).
+ * mode: day | week | month | custom
+ */
+function compare_periods(string $mode, string $date, array $q): array
+{
+    $ts = strtotime($date) ?: time();
+    switch ($mode) {
+        case 'week':
+            $a0 = strtotime('monday this week', $ts);
+            $a1 = strtotime('+1 week', $a0) - 1;
+            $b0 = strtotime('-1 week', $a0);
+            $b1 = $a0 - 1;
+            $agg = 'hour';
+            $la = 'Týždeň od ' . date('j. n.', $a0);
+            $lb = 'Týždeň od ' . date('j. n.', $b0);
+            break;
+        case 'month':
+            $a0 = strtotime(date('Y-m-01 00:00:00', $ts));
+            $a1 = strtotime('+1 month', $a0) - 1;
+            $b0 = strtotime('-1 month', $a0);
+            $b1 = $a0 - 1;
+            $agg = 'hour';
+            $months = ['', 'január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'];
+            $la = ucfirst($months[(int)date('n', $a0)]) . ' ' . date('Y', $a0);
+            $lb = ucfirst($months[(int)date('n', $b0)]) . ' ' . date('Y', $b0);
+            break;
+        case 'custom':
+            $p = fn($v, $d) => (is_string($v) && $v !== '' && ($x = strtotime($v)) !== false) ? $x : $d;
+            $a0 = $p($q['a_from'] ?? '', strtotime('today'));
+            $a1 = $p($q['a_to'] ?? '', time());
+            $b0 = $p($q['b_from'] ?? '', $a0 - 86400);
+            $b1 = $p($q['b_to'] ?? '', $a1 - 86400);
+            if ($a1 <= $a0) $a1 = $a0 + 86400;
+            if ($b1 <= $b0) $b1 = $b0 + ($a1 - $a0);
+            $span = max($a1 - $a0, $b1 - $b0);
+            $agg = $span <= 2 * 86400 ? '15m' : ($span <= 62 * 86400 ? 'hour' : 'day');
+            $la = date('j. n. H:i', $a0) . ' – ' . date('j. n. H:i', $a1);
+            $lb = date('j. n. H:i', $b0) . ' – ' . date('j. n. H:i', $b1);
+            break;
+        default:
+            $mode = 'day';
+            $a0 = strtotime(date('Y-m-d 00:00:00', $ts));
+            $a1 = $a0 + 86399;
+            $b0 = $a0 - 86400;
+            $b1 = $a0 - 1;
+            $agg = '15m';
+            $la = date('j. n. Y', $a0) === date('j. n. Y') ? 'Dnes' : date('j. n. Y', $a0);
+            $lb = date('j. n. Y', $b0) === date('j. n. Y', strtotime('yesterday')) ? 'Včera' : date('j. n. Y', $b0);
+    }
+    return [
+        'mode' => $mode, 'agg' => $agg,
+        'a' => ['from' => $a0, 'to' => $a1, 'label' => $la],
+        'b' => ['from' => $b0, 'to' => $b1, 'label' => $lb],
+    ];
+}
+
+function compare_data(int $deviceId, array $cp): array
+{
+    $out = [];
+    foreach (['a', 'b'] as $k) {
+        $f = [
+            'devices' => [$deviceId], 'eff_agg' => $cp['agg'],
+            'from_s' => date('Y-m-d H:i:s', $cp[$k]['from']), 'to_s' => date('Y-m-d H:i:s', $cp[$k]['to']),
+        ];
+        $pts = series($f)[$deviceId] ?? [];
+        $start = $cp[$k]['from'];
+        $out[$k] = [
+            'label'  => $cp[$k]['label'],
+            'from'   => $f['from_s'],
+            'to'     => $f['to_s'],
+            'points' => array_map(fn($p) => ['o' => strtotime($p['x']) - $start, 't' => $p['t'], 'h' => $p['h']], $pts),
+            'stats'  => stats($f)[$deviceId] ?? null,
         ];
     }
     return $out;

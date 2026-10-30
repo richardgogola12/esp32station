@@ -27,6 +27,7 @@
     </LinearLayout>
   </LinearLayout>
   <ImageView android:id="@+id/imgChart" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:minHeight="40dp" android:layout_marginTop="8dp" android:background="@drawable/bg_chart" android:scaleType="fitXY" />
+  <TextView android:id="@+id/tTip" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:background="@drawable/bg_tile" android:paddingStart="10dp" android:paddingEnd="10dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textColor="#F2FFFFFF" android:textSize="11sp" android:maxLines="1" android:ellipsize="end" android:visibility="gone" />
   <LinearLayout android:id="@+id/rowUpdated" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginTop="6dp">
     <ImageView android:id="@+id/iDot" android:layout_width="7dp" android:layout_height="7dp" android:src="@drawable/dot_offline" android:layout_marginEnd="6dp" />
     <TextView android:id="@+id/tName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#DDFFFFFF" android:textSize="11sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" />

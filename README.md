@@ -47,6 +47,12 @@ WebAuthn / passkeys bez externých knižníc. Aplikácia sama zistí, či zariad
 automaticky pomenuje zariadenie (model, systém, prehliadač) a doménu (RP ID). Na prihlasovacej stránke ponúkne uložený
 odtlačok aj priamo v poli „meno“. Zapína sa v **Nastavenia → Prihlásenie odtlačkom prsta**.
 
+### Porovnanie a zdieľanie
+- **Porovnanie** – deň/týždeň/mesiac (alebo vlastné obdobia) oproti predchádzajúcemu: prekrytý graf, priemer/min/max a rozdiely.
+- **Zdieľanie** – verejný odkaz len na čítanie (bez prihlásenia) pre vybrané zariadenia, s limitom histórie, platnosťou,
+  možnosťou vypnúť a počítadlom zobrazení. Odkaz má tvar `share.php?t=…`.
+- **Zaujímavosti** – porovnanie so včerajškom, pocitová teplota, absolútna vlhkosť a praktický tip (vetranie, riziko plesne/kondenzácie).
+
 ### PWA
 Manifest, ikony, service worker (offline stránka, cache statických súborov). V Chrome: menu → *Inštalovať aplikáciu*
 (alebo tlačidlo ⬇ v hornej lište).

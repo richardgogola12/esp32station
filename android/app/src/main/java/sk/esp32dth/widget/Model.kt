@@ -19,6 +19,11 @@ class Dev(
     val tMin: Double?, val tMax: Double?, val hMin: Double?, val hMax: Double?,
     val sparkT: List<Double?>,
     val sparkH: List<Double?>,
+    val vsYesterdayT: Double? = null,
+    val vsYesterdayH: Double? = null,
+    val feelsLike: Double? = null,
+    val absHumidity: Double? = null,
+    val tip: String? = null,
 )
 
 class Snapshot(
@@ -58,6 +63,11 @@ class Snapshot(
                     tMin = today?.d("tmin"), tMax = today?.d("tmax"), hMin = today?.d("hmin"), hMax = today?.d("hmax"),
                     sparkT = spark?.optJSONArray("t").list(),
                     sparkH = spark?.optJSONArray("h").list(),
+                    vsYesterdayT = d.d("vs_yesterday_t"),
+                    vsYesterdayH = d.d("vs_yesterday_h"),
+                    feelsLike = d.d("feels_like"),
+                    absHumidity = d.d("abs_humidity"),
+                    tip = if (d.isNull("tip")) null else d.optString("tip").ifBlank { null },
                 )
             }
             return Snapshot(o.optInt("refresh_minutes", 15), o.optString("dashboard_url"), devs, fetchedAt)
@@ -74,6 +84,13 @@ object Fmt {
         kotlin.math.abs(v) < 0.1 -> "→ stabilne"
         v > 0 -> "↗ +" + String.format(sk, "%.1f", v) + unit
         else -> "↘ " + String.format(sk, "%.1f", v) + unit
+    }
+
+    fun delta(v: Double?, unit: String): String = when {
+        v == null -> "–"
+        kotlin.math.abs(v) < 0.1 -> "rovnako"
+        v > 0 -> "+" + String.format(sk, "%.1f", v) + unit
+        else -> String.format(sk, "%.1f", v) + unit
     }
 
     fun age(sec: Long?): String {

@@ -109,7 +109,13 @@ object WidgetRenderer {
                 val tr = Fmt.trend(d.trendT, "° / h")
                 val today = if (d.tMin != null && flags and Opt.EXTRA != 0) "dnes ${Fmt.temp(d.tMin)}–${Fmt.temp(d.tMax)}" else ""
                 rv.setTextViewText(R.id.tTrend, listOf(tr, today).filter { it.isNotBlank() }.joinToString("  ·  "))
-                val fixed = 150 + (if (flags and Opt.PLACE != 0) 18 else 0) + (if (flags and (Opt.TIME or Opt.DATE) != 0) 34 else 0) - 50
+                val ins = flags and Opt.INSIGHTS != 0 && d.tip != null
+                rv.setViewVisibility(R.id.tTip, if (ins) View.VISIBLE else View.GONE)
+                if (ins) {
+                    val vs = d.vsYesterdayT?.let { " · oproti včera ${Fmt.delta(it, "°")}" } ?: ""
+                    rv.setTextViewText(R.id.tTip, d.tip + vs)
+                }
+                val fixed = 150 + (if (ins) 28 else 0) + (if (flags and Opt.PLACE != 0) 18 else 0) + (if (flags and (Opt.TIME or Opt.DATE) != 0) 34 else 0) - 50
                 val bw = ((wDp - 28) * scale).toInt()
                 val bh = ((hDp - fixed).coerceAtLeast(44) * scale).toInt()
                 rv.setImageViewBitmap(R.id.imgChart, Bitmaps.chart(d.sparkT, d.sparkH, bw, bh, scale))
@@ -126,7 +132,14 @@ object WidgetRenderer {
                 rv.setTextViewText(R.id.tMinMax, if (d.tMin != null) "${Fmt.temp(d.tMin)}–${Fmt.temp(d.tMax)}" else "–")
                 rv.setTextViewText(R.id.tDew, Fmt.temp(d.dew) + "C")
                 rv.setTextViewText(R.id.tComfort, d.comfort ?: "–")
-                val fixed = 205 + (if (extra) 52 else 0) + (if (flags and Opt.PLACE != 0) 18 else 0) +
+                val ins = flags and Opt.INSIGHTS != 0
+                rv.setViewVisibility(R.id.rowStats2, if (ins) View.VISIBLE else View.GONE)
+                rv.setViewVisibility(R.id.tTip, if (ins && d.tip != null) View.VISIBLE else View.GONE)
+                rv.setTextViewText(R.id.tVsY, Fmt.delta(d.vsYesterdayT, "°C"))
+                rv.setTextViewText(R.id.tFeels, Fmt.temp(d.feelsLike) + "C")
+                rv.setTextViewText(R.id.tAbs, d.absHumidity?.let { String.format(sk, "%.1f g/m³", it) } ?: "–")
+                if (d.tip != null) rv.setTextViewText(R.id.tTip, d.tip)
+                val fixed = 205 + (if (extra) 52 else 0) + (if (ins) 80 else 0) + (if (flags and Opt.PLACE != 0) 18 else 0) +
                     (if (flags and (Opt.TIME or Opt.DATE) != 0) 40 else 0) - 40
                 val bw = ((wDp - 28) * scale).toInt()
                 val bh = ((hDp - fixed).coerceAtLeast(56) * scale).toInt()
@@ -183,7 +196,12 @@ object WidgetRenderer {
                 rv.setTextViewText(ids[2], d.name)
                 rv.setTextViewText(ids[3], place(d))
                 rv.setImageViewBitmap(ids[4], Bitmaps.spark(d.sparkT, Bitmaps.TEMP, sw, sh))
-                rv.setTextViewText(ids[5], Fmt.temp(d.temp))
+                val arrow = when {
+                    d.trendT == null || kotlin.math.abs(d.trendT) < 0.1 -> ""
+                    d.trendT > 0 -> " ↗"
+                    else -> " ↘"
+                }
+                rv.setTextViewText(ids[5], Fmt.temp(d.temp) + arrow)
                 rv.setTextViewText(ids[6], Fmt.hum(d.hum))
             }
         }

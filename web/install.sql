@@ -84,3 +84,22 @@ CREATE TABLE IF NOT EXISTS `esp32dth_login_attempts` (
   PRIMARY KEY (`id`),
   KEY `ix_esp32dth_attempts_ip_time` (`ip`, `created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `esp32dth_shares` (
+  `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id`     INT UNSIGNED NOT NULL,
+  `token`       CHAR(32)     NOT NULL,
+  `name`        VARCHAR(80)  NOT NULL,
+  `device_ids`  VARCHAR(500) NOT NULL,
+  `max_days`    SMALLINT UNSIGNED NOT NULL DEFAULT 7,
+  `show_location` TINYINT(1) NOT NULL DEFAULT 1,
+  `is_active`   TINYINT(1)   NOT NULL DEFAULT 1,
+  `expires_at`  DATETIME     NULL DEFAULT NULL,
+  `views`       INT UNSIGNED NOT NULL DEFAULT 0,
+  `last_view_at` DATETIME    NULL DEFAULT NULL,
+  `created_at`  DATETIME     NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_esp32dth_shares_token` (`token`),
+  KEY `ix_esp32dth_shares_user` (`user_id`),
+  CONSTRAINT `fk_esp32dth_shares_user` FOREIGN KEY (`user_id`) REFERENCES `esp32dth_users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

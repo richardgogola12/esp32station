@@ -47,6 +47,16 @@ try {
         ]);
     }
 
+    if ($action === 'compare') {
+        $id = (int)($_GET['d'] ?? 0);
+        $owned = array_column($devices, null, 'id');
+        if (!isset($owned[$id])) {
+            json_out(['ok' => false, 'error' => 'Zariadenie neexistuje'], 404);
+        }
+        $cp = compare_periods((string)($_GET['mode'] ?? 'day'), (string)($_GET['date'] ?? date('Y-m-d')), $_GET);
+        json_out(['ok' => true, 'mode' => $cp['mode'], 'agg' => $cp['agg'], 'device' => $owned[$id]['name'], 'color' => $owned[$id]['color']] + compare_data($id, $cp));
+    }
+
     json_out(['ok' => false, 'error' => 'Neznáma akcia'], 400);
 } catch (PDOException $ex) {
     error_log('[esp32dth] data: ' . $ex->getMessage());

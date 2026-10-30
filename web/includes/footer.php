@@ -11,7 +11,7 @@ $useCharts   = $useCharts ?? false;
 
 <?php if (current_user()): ?>
 <nav class="bottom-nav d-lg-none">
-  <?php foreach ($nav as $key => [$href, $icon, $label]): ?>
+  <?php foreach ($nav as $key => [$href, $icon, $label]): if ($key === 'shares') continue; ?>
     <a class="<?= $activeNav === $key ? 'active' : '' ?>" href="<?= e(url($href)) ?>">
       <i class="bi <?= $icon ?>"></i><span><?= e($label) ?></span>
     </a>

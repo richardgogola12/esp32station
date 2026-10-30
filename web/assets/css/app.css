@@ -108,10 +108,10 @@ a { text-decoration: none; }
 @media (min-width: 992px) { .app-main { margin-left: var(--sidebar-w); padding: 32px 36px 48px; } }
 
 .bottom-nav {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 1030; display: grid; grid-template-columns: repeat(4, 1fr);
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 1030; display: grid; grid-template-columns: repeat(5, 1fr);
   padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border);
 }
-.bottom-nav a { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 2px; border-radius: 10px; color: var(--muted); font-size: .72rem; font-weight: 600; }
+.bottom-nav a { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 2px; border-radius: 10px; color: var(--muted); font-size: .66rem; white-space: nowrap; font-weight: 600; }
 .bottom-nav a i { font-size: 1.3rem; }
 .bottom-nav a.active { color: var(--accent); }
 [data-bs-theme="dark"] .bottom-nav a.active { color: #a5b4fc; }
@@ -215,7 +215,7 @@ a { text-decoration: none; }
 .flash { animation: flash .7s; }
 @keyframes flash { 0% { opacity: .4; } 100% { opacity: 1; } }
 .spark { width: 100%; height: 48px; display: block; margin: 12px 0 6px; }
-.dev-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border); }
+.dev-facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border); }
 .dev-facts > div { min-width: 0; }
 .dev-facts > div > span { display: block; font-size: .7rem; color: var(--muted); font-weight: 600; }
 .dev-facts b { display: block; font-size: .86rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -322,3 +322,31 @@ details summary { cursor: pointer; }
 .kv dd { margin: 0; font-weight: 600; }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+@media (max-width: 420px) { .dev-facts { grid-template-columns: repeat(2, 1fr); row-gap: 8px; } }
+.dev-tip { margin-top: 10px; padding: 8px 12px; border-radius: 10px; background: var(--surface-2); font-size: .84rem; font-weight: 500; }
+.dev-tip:empty { display: none; }
+
+/* ---------- Porovnanie ---------- */
+.cmp-legend { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.cmp-period { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); flex: 1; min-width: 200px; }
+.cmp-period small { display: block; font-size: .72rem; color: var(--muted); font-weight: 600; }
+.cmp-period .sw { width: 22px; height: 4px; border-radius: 2px; flex: none; }
+.cmp-period.a .sw { background: #6366f1; }
+.cmp-period.b .sw { background: repeating-linear-gradient(90deg, #94a3b8 0 6px, transparent 6px 10px); }
+.cmp-vs { font-weight: 800; color: var(--muted); }
+.cmp-title { font-weight: 700; margin-bottom: 10px; display: flex; gap: 8px; align-items: center; }
+.cmp-row { display: grid; grid-template-columns: 1.1fr .8fr .8fr 1.3fr; gap: 8px; align-items: center; padding: 8px 0; border-top: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+.cmp-row.head { border-top: 0; padding-top: 0; font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.cmp-row span:first-child { color: var(--muted); font-size: .88rem; }
+.cmp-row b.a { color: #818cf8; } .cmp-row b.b { color: var(--muted); }
+.cmp-row.head b { color: var(--muted) !important; font-weight: 700; }
+.delta { font-weight: 700; font-size: .86rem; }
+.delta.up { color: var(--temp); } .delta.down { color: var(--hum); } .delta.same { color: var(--muted); font-weight: 500; }
+
+/* ---------- Verejná stránka zdieľania ---------- */
+.share-body { background: radial-gradient(900px 420px at 0% -10%, rgba(99, 102, 241, .16), transparent 60%), var(--bg); }
+.share-main { max-width: 1180px; margin: 0 auto; padding: calc(16px + env(safe-area-inset-top)) 14px 24px; }
+.share-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; }
+.share-clock .t { font-size: 1.9rem; font-weight: 300; line-height: 1; letter-spacing: -.02em; }
+.share-clock #clockD { text-transform: capitalize; }

@@ -65,14 +65,16 @@ object Opt {
     const val DATE = 4
     const val EXTRA = 8
     const val UPDATED = 32
+    const val INSIGHTS = 64
 
     val ALL = listOf(
         TIME to "Hodiny",
         DATE to "Dátum",
         PLACE to "Adresa / umiestnenie",
         EXTRA to "Detaily (dnes min/max, rosný bod, komfort)",
+        INSIGHTS to "Zaujímavosti (oproti včera, pocitovo, abs. vlhkosť, tip)",
         UPDATED to "Čas poslednej aktualizácie",
     )
 
-    fun defaults(kind: Int): Int = PLACE or TIME or DATE or EXTRA or UPDATED
+    fun defaults(kind: Int): Int = PLACE or TIME or DATE or EXTRA or UPDATED or INSIGHTS
 }

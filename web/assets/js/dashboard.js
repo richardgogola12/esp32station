@@ -34,6 +34,10 @@
       f('seen').textContent = d.last_seen_h;
       f('dew').textContent = App.num(d.dew_point, 1);
       f('comfort').textContent = d.comfort || '–';
+      f('vsy').textContent = d.vs_yesterday_t === null ? '–' : (d.vs_yesterday_t > 0 ? '+' : '') + App.num(d.vs_yesterday_t) + ' °C';
+      f('feels').textContent = App.num(d.feels_like, 1);
+      f('abs').textContent = App.num(d.abs_humidity, 1);
+      f('tip').textContent = d.tip ? d.tip.icon + ' ' + d.tip.text : '';
       f('range').textContent = d.today ? `${App.num(d.today.tmin)}–${App.num(d.today.tmax)} °C` : '–';
       f('tt').innerHTML = trendHtml(d.trend_t, '°C');
       f('ht').innerHTML = trendHtml(d.trend_h, '%');

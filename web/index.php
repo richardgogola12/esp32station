@@ -95,11 +95,15 @@ require __DIR__ . '/includes/header.php';
       <canvas class="spark" height="48" data-f="spark"></canvas>
       <div class="dev-facts">
         <div><span>Dnes</span><b data-f="range"><?= $s['today'] ? fmt_num($s['today']['tmin']) . '–' . fmt_num($s['today']['tmax']) . ' °C' : '–' ?></b></div>
+        <div><span>Oproti včera</span><b data-f="vsy"><?= $s['vs_yesterday_t'] !== null ? ($s['vs_yesterday_t'] > 0 ? '+' : '') . fmt_num($s['vs_yesterday_t']) . ' °C' : '–' ?></b></div>
+        <div><span>Pocitovo</span><b><span data-f="feels"><?= fmt_num($s['feels_like']) ?></span> °C</b></div>
         <div><span>Rosný bod</span><b><span data-f="dew"><?= fmt_num($s['dew_point']) ?></span> °C</b></div>
-        <div><span>Aktualizované</span><b data-f="seen"><?= e($s['last_seen_h']) ?></b></div>
       </div>
+      <div class="dev-tip" data-f="tip"><?= $s['tip'] ? e($s['tip']['icon'] . ' ' . $s['tip']['text']) : '' ?></div>
       <div class="device-foot">
         <span class="chip" data-f="comfort"><?= e($s['comfort'] ?? '–') ?></span>
+        <span><i class="bi bi-clock"></i> <span data-f="seen"><?= e($s['last_seen_h']) ?></span></span>
+        <span><i class="bi bi-moisture"></i> <span data-f="abs"><?= fmt_num($s['abs_humidity']) ?></span> g/m³</span>
         <a href="<?= e(url('history.php?d[]=' . $s['id'])) ?>" class="link-arrow">História <i class="bi bi-arrow-right"></i></a>
       </div>
     </article>

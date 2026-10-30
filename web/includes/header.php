@@ -13,7 +13,9 @@ send_security_headers();
 $nav = [
     'dashboard' => ['index.php',    'bi-grid-1x2',     'Prehľad'],
     'history'   => ['history.php',  'bi-graph-up',     'História'],
+    'compare'   => ['compare.php',  'bi-arrow-left-right', 'Porovnanie'],
     'devices'   => ['devices.php',  'bi-cpu',          'Zariadenia'],
+    'shares'    => ['shares.php',   'bi-share',        'Zdieľanie'],
     'settings'  => ['settings.php', 'bi-gear',         'Nastavenia'],
 ];
 ?>

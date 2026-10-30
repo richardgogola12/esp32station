@@ -68,6 +68,30 @@
       <TextView android:id="@+id/tComfort" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFFFFF" android:textSize="12sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:text="–" android:layout_marginTop="3dp" />
     </LinearLayout>
   </LinearLayout>
+  <LinearLayout android:id="@+id/rowStats2" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp">
+    <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/bg_tile" android:paddingStart="9dp" android:paddingEnd="6dp" android:paddingTop="7dp" android:paddingBottom="7dp">
+      <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_vertical">
+        <ImageView android:layout_width="11dp" android:layout_height="11dp" android:src="@drawable/ic_calendar" android:tint="#FFC4B5FD" android:importantForAccessibility="no" android:layout_marginEnd="4dp" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#99FFFFFF" android:textSize="9sp" android:maxLines="1" android:includeFontPadding="false" android:text="OPROTI VČERA" />
+      </LinearLayout>
+      <TextView android:id="@+id/tVsY" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFFFFF" android:textSize="12sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:layout_marginTop="3dp" android:text="–" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/bg_tile" android:paddingStart="9dp" android:paddingEnd="6dp" android:paddingTop="7dp" android:paddingBottom="7dp" android:layout_marginStart="6dp">
+      <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_vertical">
+        <ImageView android:layout_width="11dp" android:layout_height="11dp" android:src="@drawable/ic_thermo" android:tint="#FFFDBA74" android:importantForAccessibility="no" android:layout_marginEnd="4dp" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#99FFFFFF" android:textSize="9sp" android:maxLines="1" android:includeFontPadding="false" android:text="POCITOVO" />
+      </LinearLayout>
+      <TextView android:id="@+id/tFeels" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFFFFF" android:textSize="12sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:layout_marginTop="3dp" android:text="–" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/bg_tile" android:paddingStart="9dp" android:paddingEnd="6dp" android:paddingTop="7dp" android:paddingBottom="7dp" android:layout_marginStart="6dp">
+      <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_vertical">
+        <ImageView android:layout_width="11dp" android:layout_height="11dp" android:src="@drawable/ic_drop" android:tint="#FF7DD3FC" android:importantForAccessibility="no" android:layout_marginEnd="4dp" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#99FFFFFF" android:textSize="9sp" android:maxLines="1" android:includeFontPadding="false" android:text="ABS. VLHKOSŤ" />
+      </LinearLayout>
+      <TextView android:id="@+id/tAbs" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFFFFF" android:textSize="12sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:layout_marginTop="3dp" android:text="–" />
+    </LinearLayout>
+  </LinearLayout>
+  <TextView android:id="@+id/tTip" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:background="@drawable/bg_tile" android:paddingStart="10dp" android:paddingEnd="10dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textColor="#F2FFFFFF" android:textSize="11sp" android:maxLines="1" android:ellipsize="end" android:visibility="gone" />
   <LinearLayout android:id="@+id/rowUpdated" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginTop="6dp">
     <ImageView android:layout_width="11dp" android:layout_height="11dp" android:src="@drawable/ic_sync" android:tint="#88FFFFFF" android:importantForAccessibility="no" android:layout_marginEnd="4dp" />
     <TextView android:id="@+id/tUpdatedAt" android:layout_width="0dp" android:layout_height="wrap_content" android:textColor="#99FFFFFF" android:textSize="10sp" android:maxLines="1" android:ellipsize="end" android:includeFontPadding="false" android:layout_weight="1" />

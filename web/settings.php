@@ -101,6 +101,12 @@ require __DIR__ . '/includes/header.php';
 </div>
 <?php endif; ?>
 
+<a class="glass panel d-flex align-items-center gap-3 mb-4 text-reset d-lg-none" href="<?= e(url('shares.php')) ?>">
+  <div class="icon-bubble sm"><i class="bi bi-share"></i></div>
+  <div class="flex-grow-1"><div class="fw-semibold">Zdieľanie</div><div class="small text-secondary">Verejné odkazy na merania pre rodinu</div></div>
+  <i class="bi bi-chevron-right text-secondary"></i>
+</a>
+
 <div class="row g-4">
   <div class="col-12 col-xl-6">
     <section class="glass panel h-100" id="passkeys">

@@ -11,7 +11,7 @@ if (PHP_VERSION_ID < 80000) {
 }
 
 define('APP_ROOT', dirname(__DIR__));
-define('APP_VERSION', '1.1.1');
+define('APP_VERSION', '1.2.0');
 
 $GLOBALS['__esp32dth_cfg'] = require APP_ROOT . '/config.php';
 
@@ -504,7 +504,52 @@ function ensure_schema(): void
         if (!db()->query("SHOW COLUMNS FROM `$ut` LIKE 'widget_token_enc'")->fetch()) {
             db()->exec("ALTER TABLE `$ut` ADD COLUMN `widget_token_enc` VARCHAR(255) NULL DEFAULT NULL AFTER `widget_token_hint`");
         }
+        $sh = t('shares');
+        if (!db()->query('SHOW TABLES LIKE ' . db()->quote($sh))->fetch()) {
+            db()->exec("CREATE TABLE IF NOT EXISTS `$sh` (
+              `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+              `user_id` INT UNSIGNED NOT NULL,
+              `token` CHAR(32) NOT NULL,
+              `name` VARCHAR(80) NOT NULL,
+              `device_ids` VARCHAR(500) NOT NULL,
+              `max_days` SMALLINT UNSIGNED NOT NULL DEFAULT 7,
+              `show_location` TINYINT(1) NOT NULL DEFAULT 1,
+              `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+              `expires_at` DATETIME NULL DEFAULT NULL,
+              `views` INT UNSIGNED NOT NULL DEFAULT 0,
+              `last_view_at` DATETIME NULL DEFAULT NULL,
+              `created_at` DATETIME NOT NULL,
+              PRIMARY KEY (`id`),
+              UNIQUE KEY `uq_{$sh}_token` (`token`),
+              KEY `ix_{$sh}_user` (`user_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        }
     } catch (PDOException $e) {
         error_log('[esp32dth] ensure_schema: ' . $e->getMessage());
     }
+}
+
+
+/* ------------------------------------------------------------------ Zdieľanie */
+
+/** Načíta aktívny zdieľaný odkaz podľa tokenu (alebo null). */
+function load_share(string $token): ?array
+{
+    if (!preg_match('/^[a-f0-9]{32}$/', $token)) {
+        return null;
+    }
+    $st = db()->prepare('SELECT * FROM ' . t('shares') . ' WHERE token = ? AND is_active = 1 LIMIT 1');
+    $st->execute([$token]);
+    $sh = $st->fetch();
+    if (!$sh || ($sh['expires_at'] && strtotime($sh['expires_at']) < time())) {
+        return null;
+    }
+    return $sh;
+}
+
+/** Zariadenia patriace k zdieľaniu (len aktívne a stále vlastnené používateľom). */
+function share_devices(array $sh): array
+{
+    $ids = array_filter(array_map('intval', explode(',', (string)$sh['device_ids'])));
+    return array_values(array_filter(user_devices((int)$sh['user_id']), fn($d) => in_array((int)$d['id'], $ids, true) && (int)$d['is_active'] === 1));
 }
